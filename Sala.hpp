@@ -30,6 +30,9 @@ private:
     /// Indica si la sala puede cerrarse durante el almuerzo
     bool cerrable;
 
+    /// Indica si la sala solo abre fines de semana: "Fines", "EntreSemana",
+    bool soloAbreFines;
+
     /// Hora a la que se sale a almorzar: 12, 13 o 14
     int horaAlmuerzo;
 
@@ -79,6 +82,11 @@ public:
      * @return true si es cerrable, false en caso contrario
      */
     bool esCerrable() const;
+
+    /**
+     * @brief Verifica si la sala solo abre en fines de semana
+     * @return true si solo abre fines de semana, false en caso contrario
+     */
 
     /**
      * @brief Obtiene la hora de almuerzo de la sala

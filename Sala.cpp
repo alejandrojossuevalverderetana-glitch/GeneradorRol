@@ -3,7 +3,7 @@
 // Constructor
 Sala::Sala(std::string nombre, int id)
     : nombre(nombre), id(id),
-      requiereCapacitacion(false), restriccionHoras(false),
+      requiereCapacitacion(false), restriccionTurno(false),
       segura(false), cerrable(false), horaAlmuerzo(12) {}
 
 // Getters
@@ -19,8 +19,8 @@ bool Sala::getRequiereCapacitacion() const {
     return requiereCapacitacion;
 }
 
-bool Sala::getRestriccionHoras() const {
-    return restriccionHoras;
+bool Sala::getRestriccionTurno() const {
+    return restriccionTurno;
 }
 
 bool Sala::esSegura() const {
@@ -48,8 +48,8 @@ void Sala::setRequiereCapacitacion(bool valor) {
     requiereCapacitacion = valor;
 }
 
-void Sala::setRestriccionHoras(bool valor) {
-    restriccionHoras = valor;
+void Sala::setRestriccionTurno(bool valor) {
+    restriccionTurno = valor;
 }
 
 void Sala::setSegura(bool valor) {
