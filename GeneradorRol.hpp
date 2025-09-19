@@ -42,13 +42,13 @@ private:
     bool ValidarDisponibilidad();
 
     /**
-     * @brief Comprueba que la asignación actual cumpla con los requisitos de cada sala.
-     * 
-     * Revisa restricciones de capacitación y turnos.
-     * 
-     * @return true si todas las asignaciones son válidas, false si alguna sala queda mal asignada.
-     */
-    bool ComprobarAsignacion();
+    * @brief Comprueba si este rol es válido.
+    * 
+    * Revisa restricciones de capacitación y turnos en la sala.
+    * 
+    * @return Un vector con los roles inválidos (vacío si este rol es válido).
+    */
+    std::vector<Rol> ComprobarAsignacion();
 
     /**
      * @brief Busca guías que puedan ser asignados a salas específicas.

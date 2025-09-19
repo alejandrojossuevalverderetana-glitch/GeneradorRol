@@ -1,89 +1,105 @@
 #include "GeneradorRol.hpp"
-#include <fstream>
-#include <algorithm>
-#include <random>
-#include <ctime>
+#include <algorithm> 
+#include <random>    
+#include <iostream>   
 
-GeneradorRol::GeneradorRol(const std::vector<Guia>& guias, const std::vector<Sala>& salas)
-    : guias(guias), salas(salas)
-{
-    // Inicializar orden de guías en orden natural
-    for (int i = 0; i < guias.size(); ++i) {
-        ordenGuias.push_back(i);
+// ----------------- Constructor -----------------
+GeneradorRol::GeneradorRol(const std::vector<Guia*>& guias, const std::vector<Sala*>& salas)
+    : guias(guias), salas(salas), diaActual(0) {}
+
+// ----------------- Validar disponibilidad -----------------
+bool GeneradorRol::ValidarDisponibilidad() {
+    std::vector<Sala*> salasObligatorias;
+    for (Sala* sala : salas) {
+    if (!sala->esCerrable() && !sala->esSegura()) {
+        salasObligatorias.push_back(sala);
     }
 }
-
-void GeneradorRol::generarPrimerDia() {
-    std::shuffle(ordenGuias.begin(), ordenGuias.end(), std::default_random_engine(std::time(0)));
-    asignarAlmuerzos();
-    ++diaActual;
+    return guias.size() >= salasObligatorias.size();
 }
 
-void GeneradorRol::generarDiaSiguiente() {
-    // Rotar todos los guías 3 posiciones
-    std::rotate(ordenGuias.begin(), ordenGuias.begin() + 3, ordenGuias.end());
-    asignarAlmuerzos();
-    ++diaActual;
-}
+// ----------------- Comprobar asignación -----------------
+ std::vector<Rol> GeneradorRol::ComprobarAsignacion() {
+    std::vector<Rol> rolRestriccion;
+     for (Rol rol : roles) {
+        
 
-void GeneradorRol::asignarAlmuerzos() {
-    // Aquí haces asignación de guías a salas según las reglas
+        Sala* sala = rol.getSala();
+        Guia* guia = rol.getGuia();
 
-    std::vector<bool> usados(guias.size(), false);
+        if (!sala || !guia) continue;
 
-    for (Sala& sala : salas) {
-        Guia guiaAsignado = seleccionarGuiaValido(sala, usados);
-        // Enlazar esa sala con ese guía en una estructura que puedas luego exportar
-        // Por ejemplo, podrías guardar en un `std::map<int, int>` (idSala -> idGuia)
-    }
-
-    // Asignar horas de almuerzo a las salas (balanceado)
-    // Puedes contar cuántas hay por hora y distribuir (12, 13, 14)
-}
-
-bool GeneradorRol::guiaCumple(const Guia& guia, const Sala& sala) {
-    if (sala.getRequiereCapacitacion()) {
-        if (sala.getNombre() == "Radio" && !guia.tieneCapacitacionRadio()) return false;
-        if (sala.getNombre() == "Steam" && !guia.tieneCapacitacionSteam()) return false;
-        if (sala.getNombre() == "Tele" && !guia.tieneCapacitacionTele()) return false;
-    }
-
-    if (sala.getRestriccionHoras()) {
-        if (guia.getHorasTrabajo() == 17) return false;
-    }
-
-    return true;
-}
-
-Guia GeneradorRol::seleccionarGuiaValido(const Sala& sala, std::vector<bool>& usados) {
-    std::vector<int> candidatos;
-
-    for (int i = 0; i < ordenGuias.size(); ++i) {
-        int idx = ordenGuias[i];
-        if (!usados[idx] && guiaCumple(guias[idx], sala)) {
-            candidatos.push_back(idx);
+        
+        if (sala->getRestriccionTurno() && guia->getTurno() == "fines") {
+            rolRestriccion.push_back(rol);
         }
     }
 
-    if (!candidatos.empty()) {
-        int elegido = candidatos[rand() % candidatos.size()];
-        usados[elegido] = true;
-        return guias[elegido];
-    }
+    return rolRestriccion;
+}
+    
 
-    // Si no hay nadie disponible, devuelves alguno por defecto o lanzas error
-    return guias[0]; // Fallback de emergencia
+
+// ----------------- Buscar guías válidos -----------------
+std::vector<Guia*> GeneradorRol::BuscarGuiasValidos(Sala* sala) {
+    // En MVP simplemente retornamos todos los guías disponibles
+    return guias;
 }
 
-void GeneradorRol::guardarRolEnArchivo(const std::string& nombreArchivo) {
-    std::ofstream archivo(nombreArchivo);
+// ----------------- Asignar guías -----------------
+void GeneradorRol::AsignarGuia() {
+    // Barajar los guías aleatoriamente para el día actual
+    std::random_device rd;
+    std::mt19937 g(rd());
+    std::shuffle(guias.begin(), guias.end(), g);
 
-    if (!archivo.is_open()) return;
+    roles.clear();
+    size_t n = std::min(guias.size(), salas.size());
+    for (size_t i = 0; i < n; ++i) {
+        roles.push_back(Rol(guias[i], salas[i]));
+    }
+}
 
-    archivo << "Rol del día " << diaActual << "\n";
+// ----------------- Reasignar guías -----------------
+void GeneradorRol::ReasignarGuias(Guia* g1, Guia* g2) {
+    // Busca los roles donde están los guías y los intercambia
+    for (auto& rol : roles) {
+        if (rol.getGuia() == g1) rol.setGuia(g2);
+        else if (rol.getGuia() == g2) rol.setGuia(g1);
+    }
+}
 
-    // Escribir la asignación real aquí (según cómo decidas guardarla)
-    // archivo << "Sala 1: Guia Alejandro\n";
+// ----------------- Generar roles -----------------
+std::vector<Rol> GeneradorRol::generarRoles() {
+     
 
-    archivo.close();
+    if (!ValidarDisponibilidad()) {
+        std::cerr << "No hay suficientes guías para cubrir las salas." << std::endl;
+        roles.clear();
+        return roles;
+    }
+
+    AsignarGuia();
+    std::vector<Rol> rolRestriccion = ComprobarAsignacion();
+    std::random_device rd;
+    std::mt19937 gen(rd());  
+    if (rolRestriccion.size() > 0) {
+        for (const Rol& rol : rolRestriccion) {
+            Sala* sala = rol.getSala();
+            Guia* guia = rol.getGuia();
+            std::vector<Guia*> guiasValidos = BuscarGuiasValidos(sala);
+                if (!guiasValidos.empty()) {
+
+                std::uniform_int_distribution<> dist(0, guiasValidos.size() - 1);
+
+                int indiceAleatorio = dist(gen);
+                Guia* guiaSeleccionado = guiasValidos[indiceAleatorio];
+                    ReasignarGuias(guia, guiaSeleccionado);
+                }
+    }    
+        
+    
+    }
+    ++diaActual;
+    return roles;
 }
