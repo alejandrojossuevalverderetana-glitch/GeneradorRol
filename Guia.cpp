@@ -1,10 +1,10 @@
 #include "Guia.hpp"
 
 // Constructor
-Guia::Guia(std::string nombre, int id) :
+Guia::Guia(std::string nombre, int id, std::string turno) :
       nombre(nombre), id(id),
       capacitacion_radio(false), capacitacion_steam(false), capacitacion_tele(false),
-      horas_trabajo(0) {}
+      turno(turno) {}
 
 // Getters
 std::string Guia::getNombre() const {
@@ -27,8 +27,12 @@ bool Guia::tieneCapacitacionTele() const {
     return capacitacion_tele;
 }
 
-int Guia::getHorasTrabajo() const {
-    return horas_trabajo;
+bool Guia::tieneCapacitacionOperador() const {
+    return capacitacion_operador;
+}
+
+std::string Guia::getTurno() const {
+    return turno;
 }
 
 // Setters
@@ -52,6 +56,10 @@ void Guia::setCapacitacionTele(bool valor) {
     capacitacion_tele = valor;
 }
 
-void Guia::setHorasTrabajo(int horas) {
-    horas_trabajo = horas;
+void Guia::setCapacitacionOperador(bool valor) {
+    capacitacion_operador = valor;
+}
+
+void Guia::setTurno(std::string _turno) {
+    turno = _turno;
 }

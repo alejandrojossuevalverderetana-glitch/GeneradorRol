@@ -25,6 +25,9 @@ class Guia{
     /// Indica si el guía tiene capacitación en televisión
     bool capacitacion_tele;
 
+    /// Indica si el guía tiene capacitacion para ser Operador
+    bool capacitacion_operador;
+
     /// Turno de trabajo del guía: "Fines", "Manana", "Tarde", "FullTime" o "FullTimeFines"
     std::string turno;
 
@@ -71,6 +74,12 @@ public:
      */
     bool tieneCapacitacionTele() const;
 
+        /**
+     * @brief Verifica si el guía tiene capacitación para ser operador
+     * @return true si tiene capacitación, false en caso contrario
+     */
+    bool tieneCapacitacionOperador() const;
+
     /**
      * @brief Obtiene el turno del guía
      * @return std::string Turno
@@ -108,6 +117,12 @@ public:
      * @param valor true si tiene capacitación, false en caso contrario
      */
     void setCapacitacionTele(bool valor);
+
+        /**
+     * @brief Establece si el guía tiene capacitación de Operador
+     * @param valor true si tiene capacitación, false en caso contrario
+     */
+    void setCapacitacionOperador (bool valor);
 
     /**
      * @brief Cambia el turno del guía
