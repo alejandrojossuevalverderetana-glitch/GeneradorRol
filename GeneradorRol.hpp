@@ -55,7 +55,7 @@ private:
      * 
      * @return Un vector con los guías que cumplen los requisitos.
      */
-    std::vector<Guia*> BuscarGuiasValidos();
+    std::vector<Guia*> BuscarGuiasValidos(Sala* sala);
 
     /**
      * @brief Asigna guías a salas según la lógica definida.
