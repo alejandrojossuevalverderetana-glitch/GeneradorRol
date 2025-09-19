@@ -5,13 +5,16 @@
 
 #include <string>
 #include <vector>
+#include <fstream>
+#include <sstream>
+#include <iostream>
 /**
  * @brief Se encarga de toda la gestion de datos almacenada fuera del programa
  * 
  * Carga los datos de los guias y de las salas desde una base de datos externa
  * o desde un archivo, además de encargarse de guardarlos en el mismo lugar tambien
  */
-class Gestor{
+class GestorDatos{
     private:
         /// Tipo de almacenamiento disponible
         enum class TipoAlmacenamiento { Archivos, BaseDatos };
@@ -38,7 +41,7 @@ class Gestor{
          *
          * @param archivo Nombre del archivo desde donde se obtendrán los datos.
          */
-        Gestor(const std::string& archivo) {
+        GestorDatos(const std::string& archivo) {
             tipoAlmacenamiento = TipoAlmacenamiento::Archivos;
             configArchivo.nombreArchivo = archivo;
         }
@@ -53,7 +56,7 @@ class Gestor{
          * @param contrasena Contraseña correspondiente al usuario.
          * @param nombreBD Nombre de la base de datos a la cual se conectará el gestor.
          */
-        Gestor(const std::string& host, const std::string& usuario,
+        GestorDatos(const std::string& host, const std::string& usuario,
             const std::string& contrasena, const std::string& nombreBD) {
             tipoAlmacenamiento = TipoAlmacenamiento::BaseDatos;
             configBaseDatos.host = host;
@@ -69,7 +72,7 @@ class Gestor{
          *
          * @return std::vector<Guia> Lista de guías cargadas.
          */
-        std::vector<Guia> CargarGuias();
+        std::vector<Guia*> CargarGuias();
 
         /**
          * @brief Carga la lista de salas desde la fuente de datos.
@@ -79,7 +82,7 @@ class Gestor{
          *
          * @return std::vector<Sala> Lista de salas cargadas.
          */
-        std::vector<Sala> CargarSalas();
+        std::vector<Sala*> CargarSalas();
 
         /**
          * @brief Guarda la lista de guías en la fuente de datos.
@@ -89,7 +92,7 @@ class Gestor{
          *
          * @param guias Vector de guías a guardar.
          */
-        void GuardarGuias(const std::vector<Guia>& guias);
+        void GuardarGuias(const std::vector<Guia*>& guias);
 
         /**
          * @brief Guarda la lista de salas en la fuente de datos.
@@ -99,8 +102,27 @@ class Gestor{
          *
          * @param salas Vector de salas a guardar.
          */
-        void GuardarSalas(const std::vector<Sala>& salas);
+        void GuardarSalas(const std::vector<Sala*>& salas);
+        
+        /**
+         * @brief Libera la memoria de todos los punteros a guías en un vector y lo vacía.
+         * 
+         * Esta función recorre el vector de punteros a guías, elimina cada objeto apuntado
+         * para evitar fugas de memoria y finalmente limpia el vector.
+         * 
+         * @param guias Vector de punteros a guías a limpiar.
+         */
+        void limpiarGuias(std::vector<Guia*>& guias);
 
+        /**
+         * @brief Libera la memoria de todos los punteros a salas en un vector y lo vacía.
+         * 
+         * Esta función recorre el vector de punteros a salas, elimina cada objeto apuntado
+         * para evitar fugas de memoria y finalmente limpia el vector.
+         * 
+         * @param salas Vector de punteros a salas a limpiar.
+         */
+        void limpiarSalas(std::vector<Sala*>& salas);
 
     };
 
