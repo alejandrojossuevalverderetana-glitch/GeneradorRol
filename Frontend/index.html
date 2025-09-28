@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>🧸 Museo de los Niños - Panel Administrativo </title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header>
+    <h1>🧸 Museo de los Niños 🧸  </h1>
+    <p>Panel Administrativo Divertido y Animado</p>
+  </header>
+
+  <main>
+    <!-- Botones principales -->
+    <div class="buttons-container">
+      <button class="magic-btn" id="btnRol">🎲 Generar Rol 🎲</button>
+      <button class="magic-btn" id="btnGuias">👩‍🏫 Guias</button>
+      <button class="magic-btn" id="btnSalas">🏠 Salas</button>
+    </div>
+
+    <!-- Output de roles -->
+    <section class="output" id="output">
+      <p>¡Aquí aparecerán los roles mágicos! ✨</p>
+    </section>
+
+    <!-- Página de administración Guias -->
+    <section id="guiasPage" class="adminPage hidden">
+      <h2>Administrar Guías</h2>
+      <button id="agregarGuia" class="magic-btn">➕ Agregar Guía</button>
+      <table id="tablaGuias">
+        <thead>
+          <tr>
+            <th>Nombre</th>
+            <th>Turno</th>
+            <th>Capacitaciones</th>
+            <th>Acciones</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+      <button class="cerrarPage magic-btn">Cerrar</button>
+    </section>
+
+    <!-- Página de administración Salas -->
+    <section id="salasPage" class="adminPage hidden">
+      <h2>Administrar Salas</h2>
+      <button id="agregarSala" class="magic-btn">➕ Agregar Sala</button>
+      <table id="tablaSalas">
+        <thead>
+          <tr>
+            <th>Nombre</th>
+            <th>Hora Almuerzo</th>
+            <th>Acciones</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+      <button class="cerrarPage magic-btn">Cerrar</button>
+    </section>
+  </main>
+
+  <footer>
+    <p>© Museo de los Niños</p>
+  </footer>
+
+  <script src="script.js"></script>
+</body>
+</html>
