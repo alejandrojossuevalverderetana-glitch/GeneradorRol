@@ -1,190 +1,275 @@
-// ======= Datos de ejemplo =======
-let guias = [
-  { nombre: "Ana", turno: "mañana",capacitaciones:["Tele, Radio"] },
-  { nombre: "Luis", turno: "tarde",capacitaciones:["Tele, Radio"]  },
-  { nombre: "María", turno: "mañana",capacitaciones:["Tele, Radio"]  }
-];
+// ====================================
+// 📌 SISTEMA DE ADMINISTRACIÓN DE GUÍAS, SALAS Y CAPACITACIONES
+// ====================================
 
-let salas = [
-  { nombre: "Sala 1", horaAlmuerzo: "12:00" },
-  { nombre: "Sala 2", horaAlmuerzo: "12:30" },
-  { nombre: "Sala 3", horaAlmuerzo: "13:00" }
-];
+const App = (() => {
+  const state = {
+    guias: [
+      { nombre: "Ana", turno: "mañana", capacitaciones: ["Tele", "Radio"] },
+      { nombre: "Luis", turno: "tarde", capacitaciones: ["Tele", "Radio"] },
+      { nombre: "María", turno: "mañana", capacitaciones: ["Tele", "Radio"] }
+    ],
+    salas: [
+      { nombre: "Universo", capacitacion: "" },
+      { nombre: "Tierra", capacitacion: "" },
+      { nombre: "Costa Rica", capacitacion: "" },
+      { nombre: "Estadio", capacitacion: "" },
+      { nombre: "Radio", capacitacion: "Radio" },
+      { nombre: "Television", capacitacion: "Tele" },
+      { nombre: "Steam", capacitacion: "Steam" }
+    ],
+    capacitaciones: ["Tele", "Radio", "Steam", "Operador"],
+    roles: [],
+    actual: {
+      guia: null,
+      sala: null,
+      capacitacion: null
+    }
+  };
 
-// ======= Manejo de páginas =======
-const btnGuias = document.getElementById("btnGuias");
-const btnSalas = document.getElementById("btnSalas");
-const btnRol = document.getElementById("btnRol");
+  const dom = {
+    guiaEditPage: document.getElementById("guiaEditPage"),
+    salaEditPage: document.getElementById("salaEditPage"),
+    capacitacionEditPage: document.getElementById("capacitacionEditPage"),
 
-const guiasPage = document.getElementById("guiasPage");
-const salasPage = document.getElementById("salasPage");
-const output = document.getElementById("output");
+    btnGuias: document.getElementById("btnGuias"),
+    btnSalas: document.getElementById("btnSalas"),
+    btnCapacitaciones: document.getElementById("btnCapacitaciones"),
+    btnRol: document.getElementById("btnRol"),
 
-const cerrarBtns = document.querySelectorAll(".cerrarPage");
+    guiasPage: document.getElementById("guiasPage"),
+    salasPage: document.getElementById("salasPage"),
+    capacitacionesPage: document.getElementById("capacitacionesPage"),
+    output: document.getElementById("output"),
 
-// ======= Funciones Renderizado con Animación =======
-function renderGuias() {
-  const tbody = document.querySelector("#tablaGuias tbody");
-  tbody.innerHTML = "";
-  guias.forEach((g, i) => {
-    const tr = document.createElement("tr");
-    tr.innerHTML = `
-      <td>${g.nombre}</td>
-      <td>${g.turno}</td>
-      <td>${g.capacitaciones}</td>
-      <td>
-        <button onclick="editarGuia(${i})">✏️</button>
-        <button onclick="eliminarGuia(${i})">🗑️</button>
-      </td>
-    `;
-    tr.classList.add("fade-in");
-    tbody.appendChild(tr);
-  });
-}
+    rolesContainer: document.getElementById("rolesContainer"),
+    tablaRoles: document.getElementById("tablaRoles"),
+    exportBtn: document.getElementById("exportBtn"),
+    cancelBtn: document.getElementById("cancelBtn"),
 
-function renderSalas() {
-  const tbody = document.querySelector("#tablaSalas tbody");
-  tbody.innerHTML = "";
-    salas.forEach((s, i) => {
-    const tr = document.createElement("tr");
-    tr.innerHTML = `
-      <td>${s.nombre}</td>
-      <td>${s.horaAlmuerzo}</td>
-      <td>
-        <button onclick="editarSala(${i})">✏️</button>
-        <button onclick="eliminarSala(${i})">🗑️</button>
-      </td>
-    `;
-    tr.classList.add("fade-in");
-    tbody.appendChild(tr);
-  });
-}
+    agregarGuia: document.getElementById("agregarGuia"),
+    agregarSala: document.getElementById("agregarSala"),
+    agregarCapacitacion: document.getElementById("agregarCapacitacion"), // CORREGIDO
+    guardarGuia: document.getElementById("guardarGuia"),
+    guardarSala: document.getElementById("guardarSala"),
+    guardarCapacitacion: document.getElementById("guardarCapacitacion"), // CORREGIDO
 
-// ======= CRUD Guias =======
-function agregarGuia() {
-  const nombre = prompt("Nombre de la nueva guía:");
-  const turno = prompt("Turno (mañana/tarde/fines):");
-  if(nombre && turno) {
-    guias.push({ nombre, turno });
-    renderGuias();
-  }
-}
+    cerrarBtns: document.querySelectorAll(".cerrarPage")
+  };
 
-function editarGuia(i) {
-  const nombre = prompt("Nuevo nombre:", guias[i].nombre);
-  const turno = prompt("Nuevo turno:", guias[i].turno);
-  if(nombre && turno) {
-    guias[i].nombre = nombre;
-    guias[i].turno = turno;
-    renderGuias();
-  }
-}
+  const render = {
+    guias: () => {
+      const tbody = document.querySelector("#tablaGuias tbody");
+      tbody.innerHTML = "";
+      state.guias.forEach((g, i) => {
+        const tr = document.createElement("tr");
+        tr.innerHTML = `
+          <td>${g.nombre}</td>
+          <td>${g.turno}</td>
+          <td>${g.capacitaciones.join(", ")}</td>
+          <td>
+            <button class="editar" data-index="${i}" data-type="guia">✏️</button>
+            <button class="eliminar" data-index="${i}" data-type="guia">🗑️</button>
+          </td>
+        `;
+        tbody.appendChild(tr);
+      });
+    },
+    salas: () => {
+      const tbody = document.querySelector("#tablaSalas tbody");
+      tbody.innerHTML = "";
+      state.salas.forEach((s, i) => {
+        const tr = document.createElement("tr");
+        tr.innerHTML = `
+          <td>${s.nombre}</td>
+          <td>${s.capacitacion}</td>
+          <td>
+            <button class="editar" data-index="${i}" data-type="sala">✏️</button>
+            <button class="eliminar" data-index="${i}" data-type="sala">🗑️</button>
+          </td>
+        `;
+        tbody.appendChild(tr);
+      });
+    },
+    capacitaciones: () => {
+      const tbody = document.querySelector("#tablaCapacitaciones tbody");
+      tbody.innerHTML = "";
+      state.capacitaciones.forEach((c, i) => {
+        const tr = document.createElement("tr");
+        tr.innerHTML = `
+          <td>${c}</td>
+          <td>
+            <button class="editar" data-index="${i}" data-type="capacitacion">✏️</button>
+            <button class="eliminar" data-index="${i}" data-type="capacitacion">🗑️</button>
+          </td>
+        `;
+        tbody.appendChild(tr);
+      });
+    },
+    roles: () => {
+      const tbody = dom.tablaRoles.querySelector("tbody");
+      tbody.innerHTML = "";
+      state.roles.forEach(r => {
+        const tr = document.createElement("tr");
+        tr.innerHTML = `
+          <td>${r.sala}</td>
+          <td>${r.guia}</td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+  };
 
-function eliminarGuia(i) {
-  const row = document.querySelectorAll("#tablaGuias tbody tr")[i];
-  row.classList.add("fade-out");
-  setTimeout(() => {
-    guias.splice(i, 1);
-    renderGuias();
-  }, 300);
-}
+  const forms = {
+    abrirGuia: () => {
+      const g = state.actual.guia;
+      document.getElementById("editNombreGuia").value = g ? g.nombre : "";
+      document.getElementById("editTurno").value = g ? g.turno : "mañana";
 
-// ======= CRUD Salas =======
-function agregarSala() {
-  const nombre = prompt("Nombre de la sala:");
-  const hora = prompt("Hora de almuerzo (ej. 12:30):");
-  if(nombre && hora) {
-    salas.push({ nombre, horaAlmuerzo: hora });
-    renderSalas();
-  }
-}
+      const container = document.getElementById("editCapacitaciones");
+      container.innerHTML = "";
+      state.capacitaciones.forEach(cap => {
+        const checked = g && g.capacitaciones.includes(cap) ? "checked" : "";
+        container.innerHTML += `<label><input type="checkbox" value="${cap}" ${checked}> ${cap}</label>`;
+      });
 
-function editarSala(i) {
-  const nombre = prompt("Nuevo nombre:", salas[i].nombre);
-  const hora = prompt("Nueva hora de almuerzo:", salas[i].horaAlmuerzo);
-  if(nombre && hora) {
-    salas[i].nombre = nombre;
-    salas[i].horaAlmuerzo = hora;
-    renderSalas();
-  }
-}
+      dom.guiaEditPage.classList.remove("hidden");
+    },
+    abrirSala: () => {
+      const s = state.actual.sala;
+      document.getElementById("editNombreSala").value = s ? s.nombre : "";
 
-function eliminarSala(i) {
-  const row = document.querySelectorAll("#tablaSalas tbody tr")[i];
-  row.classList.add("fade-out");
-  setTimeout(() => {
-    salas.splice(i, 1);
-    renderSalas();
-  }, 300);
-}
+      const select = document.getElementById("editCapacitacion");
+      select.innerHTML = '<option value="">N/A</option>';
+      state.capacitaciones.forEach(cap => {
+        const selected = s && s.capacitacion === cap ? "selected" : "";
+        select.innerHTML += `<option value="${cap}" ${selected}>${cap}</option>`;
+      });
 
-// ======= Botones Agregar =======
-document.getElementById("agregarGuia").onclick = agregarGuia;
-document.getElementById("agregarSala").onclick = agregarSala;
+      dom.salaEditPage.classList.remove("hidden");
+    },
+    abrirCapacitacion: () => {
+      const c = state.actual.capacitacion;
+      document.getElementById("editNombreCapacitacion").value = c || "";
+      dom.capacitacionEditPage.classList.remove("hidden");
+    }
+  };
 
-// ======= Abrir y cerrar páginas =======
-btnGuias.onclick = () => { guiasPage.classList.remove("hidden"); renderGuias(); };
-btnSalas.onclick = () => { salasPage.classList.remove("hidden"); renderSalas(); };
-cerrarBtns.forEach(btn => btn.onclick = () => btn.closest(".adminPage").classList.add("hidden"));
+  const crud = {
+    guardarGuia: () => {
+      const nombre = document.getElementById("editNombreGuia").value.trim();
+      const turno = document.getElementById("editTurno").value;
+      const caps = Array.from(document.querySelectorAll("#editCapacitaciones input[type='checkbox']:checked")).map(i => i.value);
+      if (!nombre) return alert("El nombre no puede estar vacío");
 
-// ======= Generación de Roles visual =======
-btnRol.onclick = () => {
-  if(guias.length === 0 || salas.length === 0){
-    output.innerHTML = "<p style='color:red;'>No hay suficientes guías o salas para generar roles.</p>";
-    return;
-  }
+      if (state.actual.guia) {
+        state.actual.guia.nombre = nombre;
+        state.actual.guia.turno = turno;
+        state.actual.guia.capacitaciones = caps;
+      } else state.guias.push({ nombre, turno, capacitaciones: caps });
 
-  const shuffledGuias = [...guias].sort(() => Math.random() - 0.5);
-  const n = Math.min(shuffledGuias.length, salas.length);
+      dom.guiaEditPage.classList.add("hidden");
+      render.guias();
+    },
+    guardarSala: () => {
+      const nombre = document.getElementById("editNombreSala").value.trim();
+      const capacitacion = document.getElementById("editCapacitacion").value;
+      if (!nombre) return alert("El nombre no puede estar vacío");
 
-  output.innerHTML = "<h3>✨ Roles Generados ✨</h3>";
+      if (state.actual.sala) {
+        state.actual.sala.nombre = nombre;
+        state.actual.sala.capacitacion = capacitacion;
+      } else state.salas.push({ nombre, capacitacion });
 
-  // Botón exportar CSV
-  const exportBtn = document.createElement("button");
-  exportBtn.textContent = "📥 Exportar CSV";
-  exportBtn.classList.add("magic-btn");
-  output.appendChild(exportBtn);
+      dom.salaEditPage.classList.add("hidden");
+      render.salas();
+    },
+    guardarCapacitacion: () => {
+      const nombre = document.getElementById("editNombreCapacitacion").value.trim();
+      if (!nombre) return alert("El nombre no puede estar vacío");
 
-  let rolesGenerados = [];
+      if (state.actual.capacitacion !== null) {
+        const index = state.capacitaciones.indexOf(state.actual.capacitacion);
+        if (index !== -1) state.capacitaciones[index] = nombre;
+      } else state.capacitaciones.push(nombre);
 
-  for(let i=0; i<n; i++){
-    const rolDiv = document.createElement("div");
-    rolDiv.classList.add("rol-card", "fade-in");
-    rolDiv.innerHTML = `
-      <p>🧑‍🏫 <strong>${shuffledGuias[i].nombre}</strong></p>
-      <p>🏠 <strong>${salas[i].nombre}</strong></p>
-      <p>🍽 Hora Almuerzo: ${salas[i].horaAlmuerzo}</p>
-    `;
-    rolDiv.style.background = `hsl(${Math.random()*360}, 70%, 80%)`;
-    rolDiv.style.padding = "10px";
-    rolDiv.style.margin = "10px 0";
-    rolDiv.style.borderRadius = "15px";
-    rolDiv.style.boxShadow = "0 5px 15px rgba(0,0,0,0.2)";
-    rolDiv.style.transition = "all 0.3s";
-    rolDiv.onmouseover = () => rolDiv.style.transform = "scale(1.05)";
-    rolDiv.onmouseleave = () => rolDiv.style.transform = "scale(1)";
-    output.appendChild(rolDiv);
+      dom.capacitacionEditPage.classList.add("hidden");
+      render.capacitaciones();
+    }
+  };
 
-    rolesGenerados.push({
-      sala: salas[i].nombre,
-      guia: shuffledGuias[i].nombre,
-      horaAlmuerzo: salas[i].horaAlmuerzo
-    });
-  }
+  const generarRoles = () => {
+    if (state.guias.length === 0 || state.salas.length === 0) {
+      dom.output.innerHTML = "<p style='color:red;'>No hay suficientes guías o salas para generar roles.</p>";
+      return;
+    }
+    const shuffledGuias = [...state.guias].sort(() => Math.random() - 0.5);
+    state.roles = state.salas.map((s, i) => ({ sala: s.nombre, guia: shuffledGuias[i] ? shuffledGuias[i].nombre : "" }));
 
-  // Exportar CSV
-  exportBtn.onclick = () => {
-    let csvContent = "\uFEFF";
-    csvContent += "Sala;Guía;Hora Almuerzo\n";
-    rolesGenerados.forEach(r => {
-      csvContent += `${r.sala};${r.guia};${r.horaAlmuerzo}\n`;
-    });
+    dom.rolesContainer.classList.remove("hidden");
+    dom.btnRol.classList.add("hidden");
+    render.roles();
+  };
+
+  const exportarCSV = () => {
+    let csvContent = "\uFEFFSala;Guía\n";
+    state.roles.forEach(r => csvContent += `${r.sala};${r.guia}\n`);
+
     const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
     const link = document.createElement("a");
     link.href = URL.createObjectURL(blob);
-        link.setAttribute("download", "rol_dia.csv");
+    link.setAttribute("download", "rol_dia.csv");
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
   };
-};
+
+  const initEvents = () => {
+    dom.agregarGuia.onclick = () => { state.actual.guia = null; forms.abrirGuia(); };
+    dom.agregarSala.onclick = () => { state.actual.sala = null; forms.abrirSala(); };
+    dom.agregarCapacitacion.onclick = () => { state.actual.capacitacion = null; forms.abrirCapacitacion(); };
+
+    dom.guardarGuia.onclick = crud.guardarGuia;
+    dom.guardarSala.onclick = crud.guardarSala;
+    dom.guardarCapacitacion.onclick = crud.guardarCapacitacion;
+
+    dom.btnGuias.onclick = () => { dom.guiasPage.classList.remove("hidden"); render.guias(); };
+    dom.btnSalas.onclick = () => { dom.salasPage.classList.remove("hidden"); render.salas(); };
+    dom.btnCapacitaciones.onclick = () => { dom.capacitacionesPage.classList.remove("hidden"); render.capacitaciones(); };
+
+    dom.cerrarBtns.forEach(btn => btn.onclick = () => btn.closest(".adminPage").classList.add("hidden"));
+
+    dom.btnRol.onclick = generarRoles;
+    dom.exportBtn.onclick = exportarCSV;
+    dom.cancelBtn.onclick = () => { dom.rolesContainer.classList.add("hidden"); dom.btnRol.classList.remove("hidden"); };
+
+    document.addEventListener("click", e => {
+      if (e.target.matches(".editar")) {
+        const i = parseInt(e.target.dataset.index);
+        const type = e.target.dataset.type;
+        state.actual[type] = type === "capacitacion" ? state.capacitaciones[i] : state[type + "s"][i];
+        if (type === "guia") forms.abrirGuia();
+        if (type === "sala") forms.abrirSala();
+        if (type === "capacitacion") forms.abrirCapacitacion();
+      }
+      if (e.target.matches(".eliminar")) {
+        const i = parseInt(e.target.dataset.index);
+        const type = e.target.dataset.type;
+        if (confirm(`¿Deseas eliminar ${type}?`)) {
+          if (type === "capacitacion") state.capacitaciones.splice(i, 1);
+          else state[type + "s"].splice(i, 1);
+          render[type + "s"] ? render[type + "s"]() : render.capacitaciones();
+        }
+      }
+    });
+  };
+
+  return {
+    init: () => {
+      initEvents();
+      console.log("✅ App iniciada");
+    }
+  };
+})();
+
+App.init();
