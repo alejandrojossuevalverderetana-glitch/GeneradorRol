@@ -1,30 +1,47 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-<meta charset="UTF-8">
-<title>🧸 Museo de los Niños - Panel Administrativo </title>
-<link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8">
+  <title>🧸 Museo de los Niños - Panel Administrativo</title>
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
+  <!-- ENCABEZADO -->
   <header>
-    <h1>🧸 Museo de los Niños 🧸  </h1>
+    <h1>🧸 Museo de los Niños 🧸</h1>
     <p>Panel Administrativo Divertido y Animado</p>
   </header>
 
   <main>
-    <!-- Botones principales -->
+    <!-- BOTONES PRINCIPALES -->
     <div class="buttons-container">
-      <button class="magic-btn" id="btnRol">🎲 Generar Rol 🎲</button>
-      <button class="magic-btn" id="btnGuias">👩‍🏫 Guias</button>
+      <button class="magic-btn" id="btnGuias">👩‍🏫 Guías</button>
       <button class="magic-btn" id="btnSalas">🏠 Salas</button>
+      <button class="magic-btn" id="btnCapacitaciones">🎓 Capacitaciones</button>
     </div>
 
-    <!-- Output de roles -->
+    <!-- SECCIÓN ROLES -->
     <section class="output" id="output">
-      <p>¡Aquí aparecerán los roles mágicos! ✨</p>
+      <button class="magic-btn" id="btnRol">🎲 Generar Rol 🎲</button>
+      <div id="rolesContainer" class="hidden">
+        <h3>✨ Roles Generados ✨</h3>
+        <table id="tablaRoles">
+          <thead>
+            <tr>
+              <th>Sala</th>
+              <th>Guía</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+        <div class="btnRolesContainer">
+          <button id="exportBtn" class="magic-btn">📥 Exportar CSV</button>
+          <button id="cancelBtn" class="cancel-btn">Cancelar</button>
+        </div>
+      </div>
     </section>
 
-    <!-- Página de administración Guias -->
+    <!-- ADMINISTRAR GUÍAS -->
     <section id="guiasPage" class="adminPage hidden">
       <h2>Administrar Guías</h2>
       <button id="agregarGuia" class="magic-btn">➕ Agregar Guía</button>
@@ -42,7 +59,32 @@
       <button class="cerrarPage magic-btn">Cerrar</button>
     </section>
 
-    <!-- Página de administración Salas -->
+    <!-- EDITAR GUÍA -->
+    <section id="guiaEditPage" class="adminPage hidden">
+      <h2>✏️ Editar Guía</h2>
+      <form id="FormGuia">
+        <label>Nombre: <input type="text" id="editNombreGuia" /></label><br>
+        <label>Turno:
+          <select id="editTurno">
+            <option value="mañana">Mañana</option>
+            <option value="tarde">Tarde</option>
+            <option value="TC Mañana">Tiempo Completo Mañana</option>
+            <option value="TC Tarde">Tiempo Completo Tarde</option>
+            <option value="fines">Fines</option>
+          </select>
+        </label><br>
+        <fieldset>
+          <legend>Capacitaciones</legend>
+          <div id="editCapacitaciones"></div>
+        </fieldset>
+        <div class="form-buttons">
+          <button type="button" id="guardarGuia" class="magic-btn">✅ Guardar</button>
+          <button type="button" class="cerrarPage cancel-btn">❌ Cancelar</button>
+        </div>
+      </form>
+    </section>  
+
+    <!-- ADMINISTRAR SALAS -->
     <section id="salasPage" class="adminPage hidden">
       <h2>Administrar Salas</h2>
       <button id="agregarSala" class="magic-btn">➕ Agregar Sala</button>
@@ -50,13 +92,56 @@
         <thead>
           <tr>
             <th>Nombre</th>
-            <th>Hora Almuerzo</th>
+            <th>Capacitación</th>
             <th>Acciones</th>
           </tr>
         </thead>
         <tbody></tbody>
       </table>
       <button class="cerrarPage magic-btn">Cerrar</button>
+    </section>
+
+    <!-- EDITAR SALA -->
+    <section id="salaEditPage" class="adminPage hidden">
+      <h2>✏️ Editar Sala</h2>
+      <form id="FormSala">
+        <label>Nombre: <input type="text" id="editNombreSala" /></label><br>
+        <label>Capacitación:
+          <select id="editCapacitacion"><option value="">N/A</option></select>
+        </label><br>
+        <div class="form-buttons">
+          <button type="button" id="guardarSala" class="magic-btn">✅ Guardar</button>
+          <button type="button" class="cerrarPage cancel-btn">❌ Cancelar</button>
+        </div>
+      </form>
+    </section>
+
+    <!-- ADMINISTRAR CAPACITACIONES -->
+    <section id="capacitacionesPage" class="adminPage hidden">
+      <h2>Administrar Capacitaciones</h2>
+      <button id="agregarCapacitacion" class="magic-btn">➕ Agregar Capacitación</button>
+      <table id="tablaCapacitaciones">
+        <thead>
+          <tr>
+            <th>Capacitación</th>
+            <th>Acciones</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+      <button class="cerrarPage magic-btn">Cerrar</button>
+    </section>
+
+    <!-- EDITAR CAPACITACIÓN -->
+    <section id="capacitacionEditPage" class="adminPage hidden">
+      <h2>✏️ Editar Capacitación</h2>
+      <form id="FormCapacitacion">
+        <label>Nombre: <input type="text" id="editNombreCapacitacion" /></label><br>
+        <div class="form-buttons">
+          <button type="button" id="guardarCapacitacion" class="magic-btn">✅ Guardar</button>
+          <button type="button" class="cerrarPage cancel-btn">❌ Cancelar</button>
+        </div>
+      </form>
     </section>
   </main>
 
