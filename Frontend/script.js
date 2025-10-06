@@ -3,6 +3,10 @@
 // ====================================
 
 const App = (() => {
+// =====================================================
+// 🗂 Estado de la aplicación
+// Se almacenan datos principales: guías, salas, capacitaciones, roles generados y elementos seleccionados actualmente
+// =====================================================
   const state = {
     guias: [
       { nombre: "Ana", turno: "mañana", capacitaciones: ["Tele", "Radio"] },
@@ -26,11 +30,16 @@ const App = (() => {
       capacitacion: null
     }
   };
-
+// =====================================================
+// 🌐 Referencias al DOM
+// Contiene todos los elementos HTML que se manipulan, como botones, páginas de edición y contenedores de datos
+// =====================================================
   const dom = {
     guiaEditPage: document.getElementById("guiaEditPage"),
     salaEditPage: document.getElementById("salaEditPage"),
     capacitacionEditPage: document.getElementById("capacitacionEditPage"),
+    rolEditPage:document.getElementById("rolEditPage"),
+    cambiosForm:document.getElementById("cambiosForm"),
 
     btnGuias: document.getElementById("btnGuias"),
     btnSalas: document.getElementById("btnSalas"),
@@ -42,6 +51,7 @@ const App = (() => {
     capacitacionesPage: document.getElementById("capacitacionesPage"),
     output: document.getElementById("output"),
 
+    rolSlider: document.getElementById("rolSlider"),
     rolesContainer: document.getElementById("rolesContainer"),
     tablaRoles: document.getElementById("tablaRoles"),
     exportBtn: document.getElementById("exportBtn"),
@@ -49,14 +59,25 @@ const App = (() => {
 
     agregarGuia: document.getElementById("agregarGuia"),
     agregarSala: document.getElementById("agregarSala"),
-    agregarCapacitacion: document.getElementById("agregarCapacitacion"), // CORREGIDO
+    agregarCapacitacion: document.getElementById("agregarCapacitacion"),
+    agregarCambio: document.getElementById("agregarCambio"),
+
     guardarGuia: document.getElementById("guardarGuia"),
     guardarSala: document.getElementById("guardarSala"),
-    guardarCapacitacion: document.getElementById("guardarCapacitacion"), // CORREGIDO
+    guardarCapacitacion: document.getElementById("guardarCapacitacion"), 
+    guardarCambio : document.getElementById("guardarCambio"),
+    guardarRol: document.getElementById("guardarRol"),
+
+    cancelarRol: document.getElementById("cancelarRol"),
+    cancelarCambio: document.getElementById("cancelarCambio"),
 
     cerrarBtns: document.querySelectorAll(".cerrarPage")
+    
   };
-
+// =====================================================
+// 🖌 Funciones de renderizado
+// Se encargan de actualizar las tablas de guías, salas, capacitaciones y roles en el HTML
+// =====================================================
   const render = {
     guias: () => {
       const tbody = document.querySelector("#tablaGuias tbody");
@@ -119,7 +140,10 @@ const App = (() => {
       });
     }
   };
-
+// =====================================================
+// 📄 Manejo de formularios
+// Abre formularios de edición o creación de guías, salas y capacitaciones, rellenando datos existentes si aplica
+// =====================================================
   const forms = {
     abrirGuia: () => {
       const g = state.actual.guia;
@@ -152,9 +176,17 @@ const App = (() => {
       const c = state.actual.capacitacion;
       document.getElementById("editNombreCapacitacion").value = c || "";
       dom.capacitacionEditPage.classList.remove("hidden");
+    },
+    abrirRol: () => {
+      dom.rolEditPage.classList.remove("hidden");
+      
     }
-  };
 
+  };
+// =====================================================
+// 🛠 Funciones CRUD (Crear, Leer, Actualizar, Eliminar)
+// Guardan los cambios realizados en guías, salas y capacitaciones desde los formularios
+// =====================================================
   const crud = {
     guardarGuia: () => {
       const nombre = document.getElementById("editNombreGuia").value.trim();
@@ -223,15 +255,24 @@ const App = (() => {
     link.click();
     document.body.removeChild(link);
   };
-
+// =====================================================
+// 🚀 Inicialización de la aplicación
+// Llama a la función de eventos y confirma en consola que la app está lista
+// =====================================================
   const initEvents = () => {
     dom.agregarGuia.onclick = () => { state.actual.guia = null; forms.abrirGuia(); };
     dom.agregarSala.onclick = () => { state.actual.sala = null; forms.abrirSala(); };
     dom.agregarCapacitacion.onclick = () => { state.actual.capacitacion = null; forms.abrirCapacitacion(); };
+    dom.agregarCambio.onclick = () => {dom.agregarCambio.classList.add("hidden"); dom.cambiosForm.classList.remove("hidden")}
+    
+    dom.btnRol.onclick = ()  => { dom.output.classList.add("hidden"); forms.abrirRol(); };
 
     dom.guardarGuia.onclick = crud.guardarGuia;
     dom.guardarSala.onclick = crud.guardarSala;
     dom.guardarCapacitacion.onclick = crud.guardarCapacitacion;
+    dom.guardarCambio.onclick = crud.guardarCambio;
+    dom.cancelarCambio.onclick = () => {dom.cambiosForm.classList.add("hidden"); dom.agregarCambio.classList.remove("hidden");}
+    dom.cancelarRol.onclick = () => {dom.output.classList.remove("hidden"); dom.rolEditPage.classList.add("hidden");}
 
     dom.btnGuias.onclick = () => { dom.guiasPage.classList.remove("hidden"); render.guias(); };
     dom.btnSalas.onclick = () => { dom.salasPage.classList.remove("hidden"); render.salas(); };
@@ -239,7 +280,7 @@ const App = (() => {
 
     dom.cerrarBtns.forEach(btn => btn.onclick = () => btn.closest(".adminPage").classList.add("hidden"));
 
-    dom.btnRol.onclick = generarRoles;
+    dom.guardarRol.onclick= () => {  dom.output.classList.remove("hidden");dom.rolEditPage.classList.add("hidden"); generarRoles(); };
     dom.exportBtn.onclick = exportarCSV;
     dom.cancelBtn.onclick = () => { dom.rolesContainer.classList.add("hidden"); dom.btnRol.classList.remove("hidden"); };
 

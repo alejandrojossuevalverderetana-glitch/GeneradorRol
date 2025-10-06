@@ -41,6 +41,57 @@
       </div>
     </section>
 
+    <section id="rolEditPage" class="adminPage hidden">
+      <h2>✏️ Modificar Rol</h2>
+      <form id="FormGuia">
+        <label> Espacios a bajar (1-10) </label>
+        <div class="slider-container">
+          <input type="range" min="1" max="10" value="5" id="rolSlider">
+          <span id="valor">5</span>
+        </div>
+        <label>Turno:
+          <select id="editTurno">
+            <option value="mañana">Mañana</option>
+            <option value="tarde">Tarde</option>
+            <option value="fines">Fines</option>
+          </select>
+        </label><br>
+        <fieldset>
+          <legend>Operadores</legend>
+          <div id="editOperadores"></div>
+        </fieldset>
+        <div>
+          <label> Cambios: </label>
+            <table id="cambiosContainer" class="">
+            <tr>
+              <th>Guia Tarde</th>
+              <th>Guia Mañana</th>
+            </tr>
+            </table>
+          <button type="button" id="agregarCambio" class="magic-btn">➕ Agregar Cambio</button>
+        </div>
+          
+
+      
+  <div class="form-container hidden" id="cambiosForm">
+    <label>Seleccione guías:</label>
+      <select class="selectGuia">
+        <option value="" disabled selected> Guía tarde </option>
+      </select>
+      <select class="selectGuia">
+        <option value="" disabled selected> Guía mañana </option>  
+      </select>
+      <button type="button" id="guardarCambio" class="magic-btn">✅ Guardar</button>
+      <button type="button" id="cancelarCambio"class ="cancel-btn">❌ Cancelar</button>
+  </div>
+
+        <div class="form-buttons">
+          <button type="button" id="guardarRol" class="magic-btn">✅ Guardar</button>
+          <button type="button" id="cancelarRol" class="cancel-btn">❌ Cancelar</button>
+        </div>
+      </form>
+    </section>  
+
     <!-- ADMINISTRAR GUÍAS -->
     <section id="guiasPage" class="adminPage hidden">
       <h2>Administrar Guías</h2>
@@ -146,7 +197,7 @@
   </main>
 
   <footer>
-    <p>© Museo de los Niños</p>
+    <p>©Operacion Museo -- Museo de los Niños</p>
   </footer>
 
   <script src="script.js"></script>
