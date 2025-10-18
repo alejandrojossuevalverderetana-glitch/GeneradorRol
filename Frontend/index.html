@@ -43,7 +43,7 @@
 
     <section id="rolEditPage" class="adminPage hidden">
       <h2>✏️ Modificar Rol</h2>
-      <form id="FormGuia">
+      <form id="FormRol">
         <label> Espacios a bajar (1-10) </label>
         <div class="slider-container">
           <input type="range" min="1" max="10" value="5" id="rolSlider">
@@ -53,7 +53,9 @@
           <select id="editTurno">
             <option value="mañana">Mañana</option>
             <option value="tarde">Tarde</option>
-            <option value="fines">Fines</option>
+            <option value="fines-mañana">Fines Mañana</option>
+            <option value="fines-tarde">Fines Tarde</option>
+            
           </select>
         </label><br>
         <fieldset>
@@ -62,7 +64,7 @@
         </fieldset>
         <div>
           <label> Cambios: </label>
-            <table id="cambiosContainer" class="">
+            <table id="cambiosContainer" class="hidden">
             <tr>
               <th>Guia Tarde</th>
               <th>Guia Mañana</th>
@@ -116,11 +118,11 @@
       <form id="FormGuia">
         <label>Nombre: <input type="text" id="editNombreGuia" /></label><br>
         <label>Turno:
-          <select id="editTurno">
+          <select id="editTurnoGuia">
             <option value="mañana">Mañana</option>
             <option value="tarde">Tarde</option>
-            <option value="TC Mañana">Tiempo Completo Mañana</option>
-            <option value="TC Tarde">Tiempo Completo Tarde</option>
+            <option value="TC mañana">Tiempo Completo Mañana</option>
+            <option value="TC tarde">Tiempo Completo Tarde</option>
             <option value="fines">Fines</option>
           </select>
         </label><br>
