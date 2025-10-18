@@ -1,6 +1,15 @@
 // ====================================
-// 📌 SISTEMA DE ADMINISTRACIÓN DE GUÍAS, SALAS Y CAPACITACIONES
+// SISTEMA DE ADMINISTRACIÓN DE GUÍAS, SALAS Y CAPACITACIONES
 // ====================================
+
+// ++++++++++++++++++++++++++++++++++++
+// TODO:
+// 1. Agregar lógica para guardar un cambio
+// 2. Agregar persistencia (JSON o CSV)
+// 3. Guardar el último rol generado por turno
+// 4. Generar rol mediante API privada
+// 5. Validacion
+// +++++++++++++++++++++++++++++++++++++
 
 const App = (() => {
 // =====================================================
@@ -9,9 +18,12 @@ const App = (() => {
 // =====================================================
   const state = {
     guias: [
-      { nombre: "Ana", turno: "mañana", capacitaciones: ["Tele", "Radio"] },
+      { nombre: "Ana", turno: "mañana", capacitaciones: ["Tele", "Operador"] },
+      { nombre: "Pedro", turno: "mañana", capacitaciones: ["Tele", "Operador"] },
+      { nombre: "Juan", turno: "mañana", capacitaciones: ["Tele", "Operador"] },
+      { nombre: "Salem", turno: "tarde", capacitaciones: ["Tele", "Operador"] },
       { nombre: "Luis", turno: "tarde", capacitaciones: ["Tele", "Radio"] },
-      { nombre: "María", turno: "mañana", capacitaciones: ["Tele", "Radio"] }
+      { nombre: "María", turno: "tarde", capacitaciones: ["Tele", "Radio"] }
     ],
     salas: [
       { nombre: "Universo", capacitacion: "" },
@@ -28,7 +40,8 @@ const App = (() => {
       guia: null,
       sala: null,
       capacitacion: null
-    }
+    },
+    cambios: []
   };
 // =====================================================
 // 🌐 Referencias al DOM
@@ -40,6 +53,7 @@ const App = (() => {
     capacitacionEditPage: document.getElementById("capacitacionEditPage"),
     rolEditPage:document.getElementById("rolEditPage"),
     cambiosForm:document.getElementById("cambiosForm"),
+    editTurno:document.getElementById("editTurno"),
 
     btnGuias: document.getElementById("btnGuias"),
     btnSalas: document.getElementById("btnSalas"),
@@ -51,11 +65,13 @@ const App = (() => {
     capacitacionesPage: document.getElementById("capacitacionesPage"),
     output: document.getElementById("output"),
 
+    sliderValue: document.getElementById("valor"),
     rolSlider: document.getElementById("rolSlider"),
     rolesContainer: document.getElementById("rolesContainer"),
     tablaRoles: document.getElementById("tablaRoles"),
     exportBtn: document.getElementById("exportBtn"),
     cancelBtn: document.getElementById("cancelBtn"),
+    cambiosContainer: document.getElementById("cambiosContainer"),
 
     agregarGuia: document.getElementById("agregarGuia"),
     agregarSala: document.getElementById("agregarSala"),
@@ -138,7 +154,29 @@ const App = (() => {
         `;
         tbody.appendChild(tr);
       });
-    }
+    },
+  cambios: (cambios, tabla) => {
+    if (!Array.isArray(cambios) || !tabla) return;
+
+    const filas = cambios.map(c => `
+      <tr>
+        <td>${c.guiaMañana}</td>
+        <td>${c.guiaTarde}</td>
+      </tr>
+    `).join("");
+
+    tabla.innerHTML = `
+      <tr>
+        <th>Guía Mañana</th>
+        <th>Guía Tarde</th>
+      </tr>
+      ${filas}
+    `;
+
+    tabla.classList.remove("hidden");
+  }
+
+
   };
 // =====================================================
 // 📄 Manejo de formularios
@@ -178,9 +216,29 @@ const App = (() => {
       dom.capacitacionEditPage.classList.remove("hidden");
     },
     abrirRol: () => {
+      const container = document.getElementById("editOperadores");
+      container.innerHTML = ""; 
+      const turno = dom.editTurno.value;
+
+      let operadores;
+
+      if (turno.startsWith("fines")) {
+        const partes = turno.split("-");
+        const subTurno = partes[1];
+        operadores = state.guias.filter(g => g.capacitaciones.includes("Operador") && g.turno.includes(subTurno));
+      }else {
+        operadores = state.guias.filter(g => g.capacitaciones.includes("Operador") && g.turno === turno || g.turno.includes("TC"));
+      }
+
+      operadores.forEach(op => {
+        const label = document.createElement("label");
+        label.innerHTML = `<input type="checkbox" value="${op.nombre}"> ${op.nombre}`;
+        container.appendChild(label);
+      });
+
       dom.rolEditPage.classList.remove("hidden");
-      
     }
+
 
   };
 // =====================================================
@@ -190,7 +248,7 @@ const App = (() => {
   const crud = {
     guardarGuia: () => {
       const nombre = document.getElementById("editNombreGuia").value.trim();
-      const turno = document.getElementById("editTurno").value;
+      const turno = document.getElementById("editTurnoGuia").value;
       const caps = Array.from(document.querySelectorAll("#editCapacitaciones input[type='checkbox']:checked")).map(i => i.value);
       if (!nombre) return alert("El nombre no puede estar vacío");
 
@@ -227,7 +285,26 @@ const App = (() => {
 
       dom.capacitacionEditPage.classList.add("hidden");
       render.capacitaciones();
-    }
+    },
+    guardarCambio: () => {
+  const selects = dom.cambiosForm.querySelectorAll("select");
+  const guiaMañana = selects[0]?.value?.trim() || "";
+  const guiaTarde = selects[1]?.value?.trim() || "";
+
+    if (!guiaMañana || !guiaTarde) {
+    alert("Debes seleccionar ambos guías antes de guardar el cambio.");
+    return;
+  }
+
+  const cambio = { guiaMañana, guiaTarde };
+  state.cambios.push(cambio);
+
+
+  dom.cambiosForm.classList.add("hidden");
+  dom.agregarCambio.classList.remove("hidden");
+  render.cambios(state.cambios, dom.cambiosContainer)
+  
+}
   };
 
   const generarRoles = () => {
@@ -263,7 +340,40 @@ const App = (() => {
     dom.agregarGuia.onclick = () => { state.actual.guia = null; forms.abrirGuia(); };
     dom.agregarSala.onclick = () => { state.actual.sala = null; forms.abrirSala(); };
     dom.agregarCapacitacion.onclick = () => { state.actual.capacitacion = null; forms.abrirCapacitacion(); };
-    dom.agregarCambio.onclick = () => {dom.agregarCambio.classList.add("hidden"); dom.cambiosForm.classList.remove("hidden")}
+    dom.agregarCambio.onclick = () => {
+  // Ocultar el botón y mostrar el formulario
+  dom.agregarCambio.classList.add("hidden");
+  dom.cambiosForm.classList.remove("hidden");
+
+  // Obtener los select dentro del formulario
+  const selects = dom.cambiosForm.querySelectorAll("select");
+  const selectMañana = selects[0];
+  const selectTarde = selects[1];
+
+  // Limpiar opciones anteriores
+  selectMañana.innerHTML = '<option value="" disabled selected>Guía mañana</option>';
+  selectTarde.innerHTML = '<option value="" disabled selected>Guía tarde</option>';
+
+  // Filtrar guías por turno
+  const guiasMañana = state.guias.filter(g => g.turno.includes("mañana"));
+  const guiasTarde = state.guias.filter(g => g.turno.includes("tarde"));
+
+  // Agregar las opciones de mañana
+  guiasMañana.forEach(g => {
+    const option = document.createElement("option");
+    option.value = g.nombre;
+    option.textContent = g.nombre;
+    selectMañana.appendChild(option);
+  });
+
+  // Agregar las opciones de tarde
+  guiasTarde.forEach(g => {
+    const option = document.createElement("option");
+    option.value = g.nombre;
+    option.textContent = g.nombre;
+    selectTarde.appendChild(option);
+  });
+};
     
     dom.btnRol.onclick = ()  => { dom.output.classList.add("hidden"); forms.abrirRol(); };
 
@@ -283,6 +393,16 @@ const App = (() => {
     dom.guardarRol.onclick= () => {  dom.output.classList.remove("hidden");dom.rolEditPage.classList.add("hidden"); generarRoles(); };
     dom.exportBtn.onclick = exportarCSV;
     dom.cancelBtn.onclick = () => { dom.rolesContainer.classList.add("hidden"); dom.btnRol.classList.remove("hidden"); };
+
+    dom.rolSlider.oninput = () => {
+      const val = dom.rolSlider.value; 
+      dom.sliderValue.textContent = val;
+
+      const porcentaje = (val / dom.rolSlider.max) * 100;
+      dom.rolSlider.style.background = `linear-gradient(to right, #FFCC33 ${porcentaje-10}%, #ddd ${porcentaje}%)`;
+    };
+
+    dom.editTurno.onchange = () => {forms.abrirRol()}
 
     document.addEventListener("click", e => {
       if (e.target.matches(".editar")) {
