@@ -97,7 +97,7 @@ input[type="range"] {
   width: 250px;
   height: 8px;
   border-radius: 5px;
-  background: linear-gradient(to right, #FFB347 0%, #FFCC33 50%, #ddd 50%, #ddd 100%);
+  background: linear-gradient(to right, #FFCC33 40%, #ddd 50%);
   outline: none;
   appearance: none;
 }
@@ -239,7 +239,16 @@ form legend {
   justify-content: space-between;
   gap: 10px;
 }
-
+#editOperadores {
+  display: flex;
+  flex-wrap: wrap; /* Permite que se vayan a la siguiente fila si no caben */
+  gap: 10px;       /* Espacio entre checkboxes */
+}
+#editOperadores label {
+  display: flex;
+  align-items: center;
+  gap: 5px;        /* Separación entre checkbox y texto */
+}
 .form-container {
   display: flex;
   flex-direction: column;
