@@ -1,8 +1,8 @@
 # GeneradorRol 🚀
 
-**GeneradorRol** es una herramienta automatizada para organizar roles y turnos de guías en distintas salas. Diseñada en C++, permite asignar a cada guía su sala correspondiente considerando su capacitación, horarios y restricciones, optimizando la distribución de tareas y turnos.
+**GeneradorRol** es una herramienta para organizar roles y turnos de guías en distintas salas. Ahora implementada como página web, mantiene la lógica de asignación inteligente, pero con interfaz interactiva que permite visualizar y editar roles en tiempo real.
 
-Este proyecto está en desarrollo y combina lógica de programación orientada a objetos con algoritmos de rotación y asignación inteligente.
+Este proyecto está en desarrollo y algunos aspectos aún están pendientes de implementar, reflejados como TODO.
 
 ---
 
@@ -14,21 +14,22 @@ Este proyecto está en desarrollo y combina lógica de programación orientada a
   - Horas de trabajo disponibles
   - Balance de horarios de almuerzo
 
-- **Rotación de roles:**  
-  Se puede rotar el orden de las guías para los días siguientes, asegurando variedad y cobertura eficiente.
+- **Visualización web:**  
+  - Roles y turnos se muestran en tablas dinámicas
+  - Ajustes interactivos mediante sliders, checkboxes y botones
+  - Interfaz responsiva para dispositivos móviles
 
-- **Exportación de resultados:**  
-  Permite guardar los roles generados en archivos de texto para su consulta o impresión.
-
-- **Estructura modular y escalable:**  
-  Gracias a las clases `Guia`, `Sala` y `GeneradorRol`, agregar nuevas reglas, salas o guías es sencillo.
+- **Estructura modular:**  
+  Las funciones están organizadas por componentes (`tabla`, `cambios`, `formulario`) para facilitar futuras ampliaciones.
 
 ---
 
-## 🔧 Funcionalidades en desarrollo
+## 🔧 TODO (pendientes)
 
-- Completar el **main** del programa para generar roles de múltiples días automáticamente  
-- Balancear de manera óptima las **horas de almuerzo** entre guías y salas  
-- Exportar todas las asignaciones de forma completa y ordenada en archivos  
-- Mejorar la **rotación de guías** para evitar repeticiones y asegurar cobertura equitativa  
-- Agregar validaciones robustas y manejo de errores  
+- Guardado de cambios directamente en la base de datos o archivo
+- Validación completa de formularios antes de aplicar cambios
+- Rotación automática de guías para múltiples días
+- Exportación de roles a CSV desde la versión web
+- Manejo de errores en la interfaz (inputs inválidos, conflictos de horarios)
+- Optimización de estilos y animaciones en móviles
+- Agregar notificaciones de confirmación al guardar o cancelar cambios
