@@ -4,7 +4,6 @@
 
 // ++++++++++++++++++++++++++++++++++++
 // TODO:
-// 1. Agregar lógica para guardar un cambio
 // 2. Agregar persistencia (JSON o CSV)
 // 3. Guardar el último rol generado por turno
 // 4. Generar rol mediante API privada
@@ -17,23 +16,8 @@ const App = (() => {
 // Se almacenan datos principales: guías, salas, capacitaciones, roles generados y elementos seleccionados actualmente
 // =====================================================
   const state = {
-    guias: [
-      { nombre: "Ana", turno: "mañana", capacitaciones: ["Tele", "Operador"] },
-      { nombre: "Pedro", turno: "mañana", capacitaciones: ["Tele", "Operador"] },
-      { nombre: "Juan", turno: "mañana", capacitaciones: ["Tele", "Operador"] },
-      { nombre: "Salem", turno: "tarde", capacitaciones: ["Tele", "Operador"] },
-      { nombre: "Luis", turno: "tarde", capacitaciones: ["Tele", "Radio"] },
-      { nombre: "María", turno: "tarde", capacitaciones: ["Tele", "Radio"] }
-    ],
-    salas: [
-      { nombre: "Universo", capacitacion: "" },
-      { nombre: "Tierra", capacitacion: "" },
-      { nombre: "Costa Rica", capacitacion: "" },
-      { nombre: "Estadio", capacitacion: "" },
-      { nombre: "Radio", capacitacion: "Radio" },
-      { nombre: "Television", capacitacion: "Tele" },
-      { nombre: "Steam", capacitacion: "Steam" }
-    ],
+    guias: [],
+    salas: [],
     capacitaciones: ["Tele", "Radio", "Steam", "Operador"],
     roles: [],
     actual: {
@@ -43,6 +27,41 @@ const App = (() => {
     },
     cambios: []
   };
+  // =====================================================
+// 💾 Persistencia de datos
+// =====================================================
+const storage = {
+  key: "appData",
+
+  guardar: () => {
+    const data = {
+      guias: state.guias,
+      salas: state.salas,
+      capacitaciones: state.capacitaciones,
+      roles: state.roles,
+      cambios: state.cambios,
+      };
+    localStorage.setItem(storage.key, JSON.stringify(data));
+    console.log("✅ Datos guardados en localStorage");
+  },
+
+  cargar: () => {
+    const raw = localStorage.getItem(storage.key);
+    if (!raw) return;
+    try {
+      const data = JSON.parse(raw);
+      state.guias = data.guias || [];
+      state.salas = data.salas || [];
+      state.capacitaciones = data.capacitaciones || [];
+      state.roles = data.roles || [];
+      state.cambios = data.cambios || [];
+      console.log("✅ Datos cargados desde localStorage");
+    } catch (e) {
+      console.error("⚠️ Error cargando datos:", e);
+    }
+  }
+};
+
 // =====================================================
 // 🌐 Referencias al DOM
 // Contiene todos los elementos HTML que se manipulan, como botones, páginas de edición y contenedores de datos
@@ -260,6 +279,7 @@ const App = (() => {
 
       dom.guiaEditPage.classList.add("hidden");
       render.guias();
+      storage.guardar();
     },
     guardarSala: () => {
       const nombre = document.getElementById("editNombreSala").value.trim();
@@ -273,6 +293,7 @@ const App = (() => {
 
       dom.salaEditPage.classList.add("hidden");
       render.salas();
+      storage.guardar();
     },
     guardarCapacitacion: () => {
       const nombre = document.getElementById("editNombreCapacitacion").value.trim();
@@ -285,6 +306,7 @@ const App = (() => {
 
       dom.capacitacionEditPage.classList.add("hidden");
       render.capacitaciones();
+      storage.guardar();
     },
     guardarCambio: () => {
   const selects = dom.cambiosForm.querySelectorAll("select");
@@ -303,6 +325,7 @@ const App = (() => {
   dom.cambiosForm.classList.add("hidden");
   dom.agregarCambio.classList.remove("hidden");
   render.cambios(state.cambios, dom.cambiosContainer)
+  storage.guardar();
   
 }
   };
@@ -420,6 +443,7 @@ const App = (() => {
           if (type === "capacitacion") state.capacitaciones.splice(i, 1);
           else state[type + "s"].splice(i, 1);
           render[type + "s"] ? render[type + "s"]() : render.capacitaciones();
+          storage.guardar();
         }
       }
     });
@@ -427,6 +451,7 @@ const App = (() => {
 
   return {
     init: () => {
+      storage.cargar();
       initEvents();
       console.log("✅ App iniciada");
     }
