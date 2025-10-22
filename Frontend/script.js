@@ -4,20 +4,21 @@
 
 // ++++++++++++++++++++++++++++++++++++
 // TODO:
-// 2. Agregar persistencia (JSON o CSV)
-// 3. Guardar el último rol generado por turno
-// 4. Generar rol mediante API privada
-// 5. Validacion
+// 1. Guardar el último rol generado por turno
+// 2. Generar rol mediante API privada
+// 3. Validacion
 // +++++++++++++++++++++++++++++++++++++
-
+// +++++++++++++++++++++++++++++++++++++
+// NEXT RELEASES
+// 1. Bases de datos
+// +++++++++++++++++++++++++++++++++++++
 const App = (() => {
 // =====================================================
 // 🗂 Estado de la aplicación
 // Se almacenan datos principales: guías, salas, capacitaciones, roles generados y elementos seleccionados actualmente
 // =====================================================
   const state = {
-    guias: [],
-    salas: [],
+    guias: [ { nombre: "Ana", turno: "mañana", capacitaciones: ["Tele", "Operador"] }, { nombre: "Pedro", turno: "mañana", capacitaciones: ["Tele", "Operador"] }, { nombre: "Juan", turno: "mañana", capacitaciones: ["Tele", "Operador"] }, { nombre: "Salem", turno: "tarde", capacitaciones: ["Tele", "Operador"] }, { nombre: "Luis", turno: "tarde", capacitaciones: ["Tele", "Radio"] }, { nombre: "María", turno: "tarde", capacitaciones: ["Tele", "Radio"] } ], salas: [ { nombre: "Universo", capacitacion: "" }, { nombre: "Tierra", capacitacion: "" }, { nombre: "Costa Rica", capacitacion: "" }, { nombre: "Estadio", capacitacion: "" }, { nombre: "Radio", capacitacion: "Radio" }, { nombre: "Television", capacitacion: "Tele" }, { nombre: "Steam", capacitacion: "Steam" } ],
     capacitaciones: ["Tele", "Radio", "Steam", "Operador"],
     roles: [],
     actual: {
@@ -256,6 +257,7 @@ const storage = {
       });
 
       dom.rolEditPage.classList.remove("hidden");
+      render.cambios(state.cambios, dom.cambiosContainer)
     }
 
 
@@ -324,7 +326,6 @@ const storage = {
 
   dom.cambiosForm.classList.add("hidden");
   dom.agregarCambio.classList.remove("hidden");
-  render.cambios(state.cambios, dom.cambiosContainer)
   storage.guardar();
   
 }
