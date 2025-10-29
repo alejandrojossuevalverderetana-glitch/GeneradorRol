@@ -40,10 +40,11 @@ RUN git clone https://github.com/chriskohlhoff/asio.git /tmp/asio && \
     cp -r /tmp/asio/asio/include/asio asio/
 
 # --- Etapa 8: Compilar todos los .cpp ---
-RUN g++ -std=c++17 Backend/api.cpp Backend/GeneradorRol.cpp Backend/GestorDatos.cpp \
-    Backend/Guia.cpp Backend/Rol.cpp Backend/Sala.cpp \
+RUN g++ -std=c++17 \
+    Backend/api.cpp Backend/GeneradorRol.cpp Backend/GestorDatos.cpp \
     -Icrow -Inlohmann -Icpp-httplib -Iasio/asio/include \
     -o api -lpthread
+
 
 # --- Etapa 9: Puerto expuesto ---
 EXPOSE 18080
