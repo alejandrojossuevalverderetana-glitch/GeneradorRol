@@ -16,6 +16,16 @@ WORKDIR /app
 # Copiar todo el proyecto al contenedor
 COPY . .
 
+# Descargar Crow
+RUN git clone https://github.com/CrowCpp/crow.git /tmp/crow && \
+    mkdir -p crow && \
+    cp -r /tmp/crow/include/crow/* crow/
+
+# Descargar JSON
+RUN mkdir -p nlohmann && \
+    curl -L https://github.com/nlohmann/json/releases/latest/download/json.hpp -o nlohmann/json.hpp
+
+
 # Compilar el proyecto
 RUN g++ -std=c++17 api.cpp -o api -Icrow -Inlohmann -lpthread
 
