@@ -1,0 +1,26 @@
+# Imagen base con g++ y cmake
+FROM debian:bookworm-slim
+
+# Actualizar e instalar dependencias necesarias
+RUN apt-get update && apt-get install -y \
+    g++ \
+    make \
+    cmake \
+    git \
+    curl \
+    && rm -rf /var/lib/apt/lists/*
+
+# Crear carpeta de trabajo
+WORKDIR /app
+
+# Copiar todo el proyecto al contenedor
+COPY . .
+
+# Compilar el proyecto
+RUN g++ -std=c++17 api.cpp -o api -Icrow -Inlohmann -lpthread
+
+# Exponer el puerto del servidor Crow (puedes cambiarlo en tu código)
+EXPOSE 8080
+
+# Comando para ejecutar el servidor
+CMD ["./api"]
