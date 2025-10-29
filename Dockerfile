@@ -11,7 +11,7 @@ COPY . .
 # Descargar Crow con la estructura correcta
 RUN git clone https://github.com/CrowCpp/crow.git /tmp/crow && \
     mkdir -p crow && \
-    cp -r /tmp/crow/include/crow crow/
+    cp -r /tmp/crow/include/* crow/
 
 # Descargar nlohmann/json con la estructura correcta
 RUN mkdir -p nlohmann && \
