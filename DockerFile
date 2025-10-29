@@ -1,19 +1,11 @@
-# Imagen base con g++ y cmake
 FROM debian:bookworm-slim
 
-# Actualizar e instalar dependencias necesarias
-RUN apt-get update && apt-get install -y \
-    g++ \
-    make \
-    cmake \
-    git \
-    curl \
-    && rm -rf /var/lib/apt/lists/*
+# Instalar dependencias
+RUN apt-get update && apt-get install -y g++ make git curl && rm -rf /var/lib/apt/lists/*
 
-# Crear carpeta de trabajo
 WORKDIR /app
 
-# Copiar todo el proyecto al contenedor
+# Copiar todo el proyecto
 COPY . .
 
 # Descargar Crow
@@ -25,12 +17,11 @@ RUN git clone https://github.com/CrowCpp/crow.git /tmp/crow && \
 RUN mkdir -p nlohmann && \
     curl -L https://github.com/nlohmann/json/releases/latest/download/json.hpp -o nlohmann/json.hpp
 
+# Compilar: ruta correcta de los archivos
+RUN g++ -std=c++17 Backend/api.cpp Backend/GeneradorRol.cpp -o api \
+    -Icrow -Inlohmann
 
-# Compilar el proyecto
-RUN g++ -std=c++17 api.cpp -o api -Icrow -Inlohmann -lpthread
-
-# Exponer el puerto del servidor Crow (puedes cambiarlo en tu código)
 EXPOSE 8080
 
-# Comando para ejecutar el servidor
 CMD ["./api"]
+
