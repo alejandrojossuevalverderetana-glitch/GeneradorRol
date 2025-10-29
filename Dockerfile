@@ -8,12 +8,12 @@ WORKDIR /app
 # Copiar tu proyecto
 COPY . .
 
-# Descargar Crow
+# Descargar Crow con la estructura correcta
 RUN git clone https://github.com/CrowCpp/crow.git /tmp/crow && \
     mkdir -p crow && \
-    cp -r /tmp/crow/include/* crow/
+    cp -r /tmp/crow/include/crow crow/
 
-# Descargar nlohmann/json
+# Descargar nlohmann/json con la estructura correcta
 RUN mkdir -p nlohmann && \
     curl -L https://github.com/nlohmann/json/releases/latest/download/json.hpp -o nlohmann/json.hpp
 
