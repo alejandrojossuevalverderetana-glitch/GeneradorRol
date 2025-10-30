@@ -22,14 +22,15 @@ RUN mkdir -p cpp-httplib && \
     curl -L https://raw.githubusercontent.com/yhirose/cpp-httplib/master/httplib.h -o cpp-httplib/httplib.h
 
 # Descargar asio
-RUN git clone https://github.com/chriskohlhoff/asio.git /tmp/asio && \
-    mkdir -p asio && \
-    cp -r /tmp/asio/asio/include/asio asio/
+RUN git clone https://github.com/chriskohlhoff/asio.git /tmp/asio
+    mkdir -p asio
+    cp /tmp/asio/asio.hpp asio/
+    cp -r /tmp/asio/asio asio/
 
 # Compilar tu proyecto
 RUN g++ -std=c++17 \
     Backend/api.cpp Backend/GeneradorRol.cpp Backend/GestorDatos.cpp \
-    -Icrow -Inlohmann -Icpp-httplib -Iasio/asio \
+    -Icrow -Inlohmann -Icpp-httplib -I./asio \
     -o api -lpthread
 
 EXPOSE 18080
