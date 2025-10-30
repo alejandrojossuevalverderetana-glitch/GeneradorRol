@@ -2,7 +2,7 @@
 #define GESTOR_DATOS_HPP
 
 #include "httplib.h"
-#include <nlohmann/json.hpp>
+#include <json.hpp>
 #include <vector>
 
 

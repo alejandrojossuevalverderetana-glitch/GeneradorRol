@@ -29,7 +29,7 @@ RUN git clone https://github.com/chriskohlhoff/asio.git /tmp/asio && \
 # Compilar tu proyecto
 RUN g++ -std=c++17 \
     Backend/api.cpp Backend/GeneradorRol.cpp Backend/GestorDatos.cpp \
-    -Icrow -Inlohmann -Icpp-httplib -Iasio/asio/include \
+    -Icrow -Inlohmann -Icpp-httplib -Iasio/asio \
     -o api -lpthread
 
 EXPOSE 18080
