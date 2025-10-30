@@ -22,9 +22,9 @@ RUN mkdir -p cpp-httplib && \
     curl -L https://raw.githubusercontent.com/yhirose/cpp-httplib/master/httplib.h -o cpp-httplib/httplib.h
 
 # Descargar asio
-RUN git clone https://github.com/chriskohlhoff/asio.git /tmp/asio
-    mkdir -p asio
-    cp /tmp/asio/asio.hpp asio/
+RUN git clone https://github.com/chriskohlhoff/asio.git /tmp/asio \
+    mkdir -p asio \
+    cp /tmp/asio/asio.hpp asio/ \
     cp -r /tmp/asio/asio asio/
 
 # Compilar tu proyecto
