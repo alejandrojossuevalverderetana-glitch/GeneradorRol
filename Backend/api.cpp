@@ -1,7 +1,7 @@
 #include "crow.h"
 #include "GestorDatos.hpp"
 #include "GeneradorRol.hpp"
-#include <nlohmann/json.hpp>
+#include <json.hpp>
 #include <iostream>
 
 int main() {
