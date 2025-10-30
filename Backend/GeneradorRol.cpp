@@ -3,8 +3,6 @@
 #include <random>
 #include <iostream>
 
-GeneradorRol::GeneradorRol() {}
-
 /**
  * @brief Verifica si hay suficientes guías para cubrir las salas críticas.
  */
