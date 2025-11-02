@@ -8,35 +8,31 @@ int main() {
     crow::SimpleApp app;
 
     // --------------------------
-    // 🔹 Soporte CORS: Preflight
+    // 🔹 Endpoint único para POST y OPTIONS con CORS
     // --------------------------
-    CROW_ROUTE(app, "/generar").methods("OPTIONS"_method)
-    ([](const crow::request&, crow::response& res) {
+    CROW_ROUTE(app, "/generar")
+    ([](const crow::request& req){
+        crow::response res;
+
+        // Cabeceras CORS para cualquier método
         res.add_header("Access-Control-Allow-Origin", "*");
         res.add_header("Access-Control-Allow-Methods", "POST, GET, OPTIONS");
         res.add_header("Access-Control-Allow-Headers", "Content-Type");
-        res.end(); // importante: termina la respuesta
-    });
 
-    // --------------------------
-    // 🔹 Endpoint principal POST
-    // --------------------------
-    CROW_ROUTE(app, "/generar").methods("POST"_method)
-    ([](const crow::request& req) {
+        if(req.method == crow::HTTPMethod::OPTIONS) {
+            // Preflight: responder OK sin cuerpo
+            res.code = 200;
+            res.end();
+            return res;
+        }
+
+        // POST normal: generar roles
         try {
-            // Parsear el cuerpo del POST como JSON
             auto jsonInput = nlohmann::json::parse(req.body);
-
-            // Crear el gestor de datos con la información recibida
             GestorDatos gestor(jsonInput);
-
-            // Crear el generador de roles
             GeneradorRol generador;
-
-            // Generar los nuevos roles
             auto nuevosRoles = generador.generarRoles(gestor);
 
-            // Convertir los roles a JSON para devolverlos
             nlohmann::json respuesta;
             for (const auto& rol : nuevosRoles) {
                 respuesta["roles"].push_back({
@@ -45,33 +41,15 @@ int main() {
                 });
             }
 
-            // Crear respuesta exitosa
-            crow::response res;
             res.code = 200;
             res.set_header("Content-Type", "application/json");
             res.body = respuesta.dump(4);
-
-            // Cabeceras CORS
-            res.add_header("Access-Control-Allow-Origin", "*");
-            res.add_header("Access-Control-Allow-Methods", "POST, GET, OPTIONS");
-            res.add_header("Access-Control-Allow-Headers", "Content-Type");
-
             return res;
         }
-        catch (const std::exception& e) {
-            // En caso de error, devolver mensaje de error
-            crow::response res;
+        catch(const std::exception& e) {
             res.code = 400;
             res.set_header("Content-Type", "application/json");
-            res.body = nlohmann::json({
-                {"error", e.what()}
-            }).dump(4);
-
-            // Cabeceras CORS también en errores
-            res.add_header("Access-Control-Allow-Origin", "*");
-            res.add_header("Access-Control-Allow-Methods", "POST, GET, OPTIONS");
-            res.add_header("Access-Control-Allow-Headers", "Content-Type");
-
+            res.body = nlohmann::json({ {"error", e.what()} }).dump(4);
             return res;
         }
     });
