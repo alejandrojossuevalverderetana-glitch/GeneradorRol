@@ -7,6 +7,20 @@
 int main() {
     crow::SimpleApp app;
 
+    // --------------------------
+    // 🔹 Soporte CORS: Preflight
+    // --------------------------
+    CROW_ROUTE(app, "/generar").methods("OPTIONS"_method)
+    ([](const crow::request&, crow::response& res) {
+        res.add_header("Access-Control-Allow-Origin", "*");
+        res.add_header("Access-Control-Allow-Methods", "POST, GET, OPTIONS");
+        res.add_header("Access-Control-Allow-Headers", "Content-Type");
+        res.end(); // importante: termina la respuesta
+    });
+
+    // --------------------------
+    // 🔹 Endpoint principal POST
+    // --------------------------
     CROW_ROUTE(app, "/generar").methods("POST"_method)
     ([](const crow::request& req) {
         try {
@@ -31,11 +45,17 @@ int main() {
                 });
             }
 
-            // Respuesta exitosa
+            // Crear respuesta exitosa
             crow::response res;
             res.code = 200;
             res.set_header("Content-Type", "application/json");
             res.body = respuesta.dump(4);
+
+            // Cabeceras CORS
+            res.add_header("Access-Control-Allow-Origin", "*");
+            res.add_header("Access-Control-Allow-Methods", "POST, GET, OPTIONS");
+            res.add_header("Access-Control-Allow-Headers", "Content-Type");
+
             return res;
         }
         catch (const std::exception& e) {
@@ -46,6 +66,12 @@ int main() {
             res.body = nlohmann::json({
                 {"error", e.what()}
             }).dump(4);
+
+            // Cabeceras CORS también en errores
+            res.add_header("Access-Control-Allow-Origin", "*");
+            res.add_header("Access-Control-Allow-Methods", "POST, GET, OPTIONS");
+            res.add_header("Access-Control-Allow-Headers", "Content-Type");
+
             return res;
         }
     });
