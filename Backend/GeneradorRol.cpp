@@ -31,7 +31,7 @@ std::vector<GestorDatos::Guia> GeneradorRol::BuscarGuiasValidos(const GestorDato
 
     for (const auto& g : guias) {
         if (std::find(g.capacitaciones.begin(), g.capacitaciones.end(), sala.capacitacion)
-            != g.capacitaciones.end()) 
+            != g.capacitaciones.end())
         {
             validos.push_back(g);
         }
@@ -46,7 +46,7 @@ std::vector<GestorDatos::Guia> GeneradorRol::BuscarGuiasValidos(const GestorDato
 void GeneradorRol::AsignarGuias(const std::vector<GestorDatos::Guia>& guias,
                                 const std::vector<GestorDatos::Sala>& salas,
                                 const std::vector<GestorDatos::Rol>& roles,
-                                int cantidadRotacion) 
+                                int cantidadRotacion)
 {
     std::vector<std::string> guiasRol;
 
@@ -62,7 +62,7 @@ void GeneradorRol::AsignarGuias(const std::vector<GestorDatos::Guia>& guias,
         // Rotar 3 espacios (o la cantidad indicada)
         int rotacion = std::min<int>(cantidadRotacion, guiasActualizados.size());
         std::rotate(guiasActualizados.begin(),
-                    guiasActualizados.begin() + rotacion,
+                    guiasActualizados.begin() - rotacion,
                     guiasActualizados.end());
     }
 
@@ -85,12 +85,17 @@ void GeneradorRol::AsignarGuias(const std::vector<GestorDatos::Guia>& guias,
 
     // Asignación de guías a salas (en orden circular usando la lista actualizada)
     std::vector<GestorDatos::Rol> rolesGenerados;
-    for (size_t i = 0; i < salas.size(); ++i) {
-        GestorDatos::Rol nuevoRol;
+for (size_t i = 0; i < salas.size(); ++i) {
+    GestorDatos::Rol nuevoRol;
+    if (i < guiasActualizados.size()) {
         nuevoRol.nombreGuia = guiasActualizados[i];
-        nuevoRol.nombreSala = salas[i].nombre;
-        rolesGenerados.push_back(nuevoRol);
+    } else {
+        nuevoRol.nombreGuia = ""; // Guía vacía para salas sin guía
     }
+    nuevoRol.nombreSala = salas[i].nombre;
+    rolesGenerados.push_back(nuevoRol);
+}
+
 
     // Ajuste para asegurar que todas las salas obligatorias tengan guía
     for (const auto& salaObligatoria : salas) {
@@ -143,7 +148,7 @@ void GeneradorRol::ReasignarGuias(GestorDatos::Rol& rol1, GestorDatos::Rol& rol2
 std::vector<GestorDatos::Rol> GeneradorRol::ComprobarAsignacion(
     const std::vector<GestorDatos::Guia>& guias,
     const std::vector<GestorDatos::Sala>& salas,
-    const std::vector<GestorDatos::Rol>& roles) 
+    const std::vector<GestorDatos::Rol>& roles)
 {
     std::vector<GestorDatos::Rol> invalidos;
 
@@ -185,4 +190,3 @@ std::vector<GestorDatos::Rol> GeneradorRol::generarRoles(const GestorDatos& dato
     // Retornar el resultado generado
     return this->rolesGenerados;
 }
-
