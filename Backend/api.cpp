@@ -4,63 +4,72 @@
 #include <json.hpp>
 #include <iostream>
 
-int main() {
-    crow::SimpleApp app;
+struct CorsMiddleware {
+    struct context {};
 
-    // Preflight OPTIONS
-    CROW_ROUTE(app, "/generar").methods("OPTIONS"_method)
-    ([](const crow::request&) {
-        crow::response res;
-        res.code = 200;
+    void before_handle(crow::request& req, crow::response& res, context&) {
         res.add_header("Access-Control-Allow-Origin", "*");
-        res.add_header("Access-Control-Allow-Methods", "POST, GET, OPTIONS");
-        res.add_header("Access-Control-Allow-Headers", "Content-Type");
-        return res;
-    });
+        res.add_header("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
+        res.add_header("Access-Control-Allow-Headers", "Content-Type, Authorization, X-Requested-With");
 
-    // POST principal
-    CROW_ROUTE(app, "/generar").methods("POST"_method)
-    ([](const crow::request& req) {
-        try {
-            auto jsonInput = nlohmann::json::parse(req.body);
-            GestorDatos gestor(jsonInput);
-            GeneradorRol generador;
-            auto nuevosRoles = generador.generarRoles(gestor);
-
-            nlohmann::json respuesta;
-            for (const auto& rol : nuevosRoles) {
-                respuesta["roles"].push_back({
-                    {"nombreGuia", rol.nombreGuia},
-                    {"nombreSala", rol.nombreSala}
-                });
-            }
-
-            crow::response res;
-            res.code = 200;
-            res.set_header("Content-Type", "application/json");
-            res.body = respuesta.dump(4);
-
-            // Cabeceras CORS para el POST
-            res.add_header("Access-Control-Allow-Origin", "*");
-            res.add_header("Access-Control-Allow-Methods", "POST, GET, OPTIONS");
-            res.add_header("Access-Control-Allow-Headers", "Content-Type");
-
-            return res;
-        } catch (const std::exception& e) {
-            crow::response res;
-            res.code = 400;
-            res.set_header("Content-Type", "application/json");
-            res.body = nlohmann::json({{"error", e.what()}}).dump(4);
-
-            // Cabeceras CORS también en error
-            res.add_header("Access-Control-Allow-Origin", "*");
-            res.add_header("Access-Control-Allow-Methods", "POST, GET, OPTIONS");
-            res.add_header("Access-Control-Allow-Headers", "Content-Type");
-
-            return res;
+        if (req.method == crow::HTTPMethod::OPTIONS) {
+            res.code = 204;
+            res.end();
         }
-    });
+    }
 
-    std::cout << "🟢 Servidor iniciado en http://localhost:8080/generar" << std::endl;
-    app.port(8080).multithreaded().run();
+    void after_handle(crow::request&, crow::response& res, context&) {
+        // Garantiza que todas las respuestas (incluyendo POST) lleven el header CORS
+        res.add_header("Access-Control-Allow-Origin", "*");
+        res.add_header("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
+        res.add_header("Access-Control-Allow-Headers", "Content-Type, Authorization, X-Requested-With");
+    }
+};
+
+int main() {
+    crow::App<CorsMiddleware> app;
+
+    CROW_ROUTE(app, "/generar").methods(crow::HTTPMethod::POST)
+([](const crow::request& req) {
+    try {
+        std::cout << "📩 Recibido POST /generar" << std::endl;
+        std::cout << "Body: " << req.body << std::endl;
+
+        auto jsonInput = nlohmann::json::parse(req.body);
+        std::cout << "✅ JSON parseado correctamente" << std::endl;
+
+        GestorDatos gestor(jsonInput);
+        std::cout << "✅ GestorDatos creado" << std::endl;
+
+        GeneradorRol generador;
+        auto nuevosRoles = generador.generarRoles(gestor);
+        std::cout << "✅ Roles generados: " << nuevosRoles.size() << std::endl;
+
+        nlohmann::json respuesta;
+        for (const auto& rol : nuevosRoles) {
+            respuesta["roles"].push_back({
+                {"nombreGuia", rol.nombreGuia},
+                {"nombreSala", rol.nombreSala}
+            });
+        }
+
+        crow::response res(respuesta.dump(4));
+        res.code = 200;
+        res.set_header("Content-Type", "application/json");
+        std::cout << "✅ Respuesta enviada correctamente" << std::endl;
+        return res;
+
+    } catch (const std::exception& e) {
+        std::cerr << "❌ Error interno: " << e.what() << std::endl;
+        nlohmann::json error = {{"error", e.what()}};
+        crow::response res(error.dump(4));
+        res.code = 400;
+        res.set_header("Content-Type", "application/json");
+        return res;
+    }
+});
+
+
+    std::cout << "🟢 Servidor iniciado en http://0.0.0.0:8080 (localhost o IP pública)" << std::endl ;
+    app.bindaddr("0.0.0.0").port(8080).multithreaded().run();
 }
