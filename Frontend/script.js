@@ -169,8 +169,8 @@ const storage = {
       state.roles.forEach(r => {
         const tr = document.createElement("tr");
         tr.innerHTML = `
-          <td>${r.sala}</td>
-          <td>${r.guia}</td>
+          <td>${r.nombreSala}</td>
+          <td>${r.nombreGuia}</td>
         `;
         tbody.appendChild(tr);
       });
@@ -331,18 +331,49 @@ const storage = {
 }
   };
 
-  const generarRoles = () => {
-    if (state.guias.length === 0 || state.salas.length === 0) {
-      dom.output.innerHTML = "<p style='color:red;'>No hay suficientes guías o salas para generar roles.</p>";
-      return;
-    }
-    const shuffledGuias = [...state.guias].sort(() => Math.random() - 0.5);
-    state.roles = state.salas.map((s, i) => ({ sala: s.nombre, guia: shuffledGuias[i] ? shuffledGuias[i].nombre : "" }));
+// Función para generar roles desde la API
+async function generarRoles() {
+    try {
+        // Preparar los datos que enviarás al servidor (puedes ajustarlo según tu estructura)
+        const payload = {
+            guias: state.guias,   // lista de guías
+            salas: state.salas,   // lista de salas
+            roles: state.roles,   // roles actuales, si aplica
+            cambios: state.cambios // cambios si los tienes
+        };
 
-    dom.rolesContainer.classList.remove("hidden");
-    dom.btnRol.classList.add("hidden");
-    render.roles();
-  };
+        // Petición POST al endpoint /generar de tu API
+        const response = await fetch("http://araxus.ddns.net:18080/generar", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(payload)
+        });
+
+        // Procesar la respuesta JSON
+        if (!response.ok) {
+            const errorData = await response.json();
+            dom.output.innerHTML = `<p style="color:red;">Error: ${errorData.error}</p>`;
+            return;
+        }
+
+        const data = await response.json();
+
+        // Guardar los roles generados en el estado
+        state.roles = data.roles.map(r => ({
+            nombreSala: r.nombreSala,
+            nombreGuia: r.nombreGuia
+        }));
+
+        // Mostrar roles en el DOM
+        dom.rolesContainer.classList.remove("hidden");
+        dom.btnRol.classList.add("hidden");
+        render.roles();
+
+    } catch (error) {
+        dom.output.innerHTML = `<p style="color:red;">Error al generar roles: ${error.message}</p>`;
+    }
+}
+
 
   const exportarCSV = () => {
     let csvContent = "\uFEFFSala;Guía\n";
