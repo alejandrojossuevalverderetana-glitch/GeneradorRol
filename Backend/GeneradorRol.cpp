@@ -62,7 +62,7 @@ void GeneradorRol::AsignarGuias(const std::vector<GestorDatos::Guia>& guias,
         // Rotar 3 espacios (o la cantidad indicada)
         int rotacion = std::min<int>(cantidadRotacion, guiasActualizados.size());
         std::rotate(guiasActualizados.begin(),
-                    guiasActualizados.begin() - rotacion,
+                    guiasActualizados.end() - rotacion,
                     guiasActualizados.end());
     }
 
