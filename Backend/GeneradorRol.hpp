@@ -18,7 +18,7 @@
 class GeneradorRol {
 private:
     /** @brief Lista interna con los roles generados. */
-    std::vector<GestorDatos::Rol> rolesGenerados;
+    std::vector<GestorDatos::RolGenerado> rolesGenerados;
 
     /**
      * @brief Valida que existan suficientes guías para cubrir las salas requeridas.
@@ -38,10 +38,10 @@ private:
      * @param roles Vector de roles generados.
      * @return Vector con los roles inválidos (vacío si todos son válidos).
      */
-    std::vector<GestorDatos::Rol> ComprobarAsignacion(
+    std::vector<GestorDatos::RolGenerado> ComprobarAsignacion(
         const std::vector<GestorDatos::Guia>& guias,
         const std::vector<GestorDatos::Sala>& salas,
-        const std::vector<GestorDatos::Rol>& roles);
+        const std::vector<GestorDatos::RolGenerado>& roles);
 
     /**
      * @brief Busca guías que puedan ser asignados a una sala específica.
@@ -51,8 +51,10 @@ private:
      * @return Vector con los guías que cumplen los requisitos.
      */
     std::vector<GestorDatos::Guia> BuscarGuiasValidos(
-        const GestorDatos::Sala& sala,
-        const std::vector<GestorDatos::Guia>& guias);
+    const GestorDatos::Sala& sala,
+    const std::vector<GestorDatos::Guia>& guias,
+    const std::vector<GestorDatos::RolGenerado>& rolesGenerados,
+    const std::vector<GestorDatos::Sala>& salas);
 
     /**
      * @brief Genera nuevas asignaciones entre guías y salas.
@@ -62,8 +64,14 @@ private:
     void AsignarGuias(const std::vector<GestorDatos::Guia>& guias,
                       const std::vector<GestorDatos::Sala>& salas,
                       const std::vector<GestorDatos::Rol>& roles,
-                      const int cantidadRotacion);
+                      const int cantidadRotacion,
+                      const std::string& turno);
+    
+    void GeneradorRol::AplicarCambiosInternos(
+    const std::vector<GestorDatos::Guia>& guias,
+    const std::vector<GestorDatos::Sala>& salas);
 
+    
     /**
      * @brief Reasigna dos guías intercambiando sus salas.
      * 
@@ -84,7 +92,7 @@ public:
      * @param datos Gestor que contiene toda la información del sistema.
      * @return Vector con los roles generados válidos.
      */
-    std::vector<GestorDatos::Rol> generarRoles(const GestorDatos& datos);
+    std::vector<GestorDatos::RolGenerado> generarRoles(const GestorDatos& datos);
 };
 
 #endif // GENERADORROL_HPP
