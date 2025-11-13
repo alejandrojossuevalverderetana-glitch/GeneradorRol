@@ -50,4 +50,8 @@ GestorDatos::GestorDatos(const nlohmann::json& AppData)
             cambios.push_back(c);
         }
     }
+    // --- Cargar rotacion ---
+    if (AppData.contains("valor") && AppData["valor"].is_number_integer()) {
+    valor = AppData["valor"].get<int>();
+    }
 }

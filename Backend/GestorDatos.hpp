@@ -19,7 +19,7 @@ public:
      * @brief Representa un guía con nombre e identificador único.
      */
     struct Guia {
-        std::string nombre; /**< Nombre del guía */
+        std::string nombre;
         std::string turno;
         std::vector<std::string> capacitaciones; 
     };
@@ -28,7 +28,7 @@ public:
      * @brief Representa una sala con nombre y su capacitacion necesaria.
      */
     struct Sala {
-        std::string nombre; /**< Nombre de la sala */
+        std::string nombre; 
         std::string capacitacion;    
         bool obligatoria;
         int numero;
@@ -38,17 +38,26 @@ public:
      * @brief Representa un rol asignando un guía a una sala.
      */
     struct Rol {
-        std::string nombreGuia; /**< Nombre del guía asignado */
-        std::string nombreSala; /**< Nombre de la sala asignada */
+        std::string nombreGuia; 
+        std::string nombreSala;
+    };
+
+    struct RolGenerado {
+        std::string nombreGuia; 
+        std::string nombreSala;
+        std::string nombreCambioInterno;
+        std::string nombreCambioAprobado;
     };
 
     /**
      * @brief Representa un cambio de guías entre turnos.
      */
     struct Cambio {
-        std::string guiaTarde;  /**< Guía del turno de la tarde */
-        std::string guiaManana; /**< Guía del turno de la mañana */
+        std::string guiaTarde;
+        std::string guiaManana;
     };
+
+    int valor;
 
     /**
      * @brief Constructor del GestorDatos.
