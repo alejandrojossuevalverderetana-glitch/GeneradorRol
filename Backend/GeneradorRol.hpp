@@ -3,6 +3,7 @@
 
 #include <vector>
 #include <string>
+#include <unordered_set>
 #include "GestorDatos.hpp"
 
 /**
@@ -10,10 +11,11 @@
  * 
  * La clase GeneradorRol administra la asignación de guías a salas en un día de trabajo.
  * 
- * - Verifica que existan suficientes guías disponibles para cubrir las salas.
- * - Asigna guías a salas siguiendo una rotación o aleatoriedad.
- * - Valida restricciones de capacitación y turnos.
- * - Permite consultar los roles generados.
+ * Funcionalidades principales:
+ * - Generación de rol inicial con rotación de guías según turno.
+ * - Aplicación de cambios internos cuando un guía no cumple requisitos de capacitación.
+ * - Posibilidad de reflejar cambios externos (otros turnos) de manera separada.
+ * - Consulta de roles generados.
  */
 class GeneradorRol {
 private:
@@ -48,49 +50,62 @@ private:
      * 
      * @param sala Sala que requiere un guía.
      * @param guias Lista completa de guías.
+     * @param rolesGenerados Roles ya generados para considerar asignaciones previas.
+     * @param salas Lista completa de salas para verificar requisitos.
      * @return Vector con los guías que cumplen los requisitos.
      */
     std::vector<GestorDatos::Guia> BuscarGuiasValidos(
-    const GestorDatos::Sala& sala,
-    const std::vector<GestorDatos::Guia>& guias,
-    const std::vector<GestorDatos::RolGenerado>& rolesGenerados,
-    const std::vector<GestorDatos::Sala>& salas);
+        const GestorDatos::Sala& sala,
+        const std::vector<GestorDatos::Guia>& guias,
+        const std::vector<GestorDatos::RolGenerado>& rolesGenerados,
+        const std::vector<GestorDatos::Sala>& salas);
 
     /**
-     * @brief Genera nuevas asignaciones entre guías y salas.
+     * @brief Genera la asignación inicial de guías a salas.
      * 
-     * Aplica una lógica de rotación distribuir el personal.
+     * Lógica:
+     * 1) Se construye un vector con la posición actual de cada guía según el rol previo.
+     * 2) Se aplica rotación de guías según cantidadRotacion.
+     * 3) Se asignan guías nuevas que no estén ocupadas y que pertenezcan al turno actual.
+     * 4) Se construye el vector de roles generados y se guarda internamente.
+     * 
+     * @param guias Vector de guías disponibles.
+     * @param salas Vector de salas.
+     * @param roles Roles previos para considerar rotación.
+     * @param cantidadRotacion Cantidad de posiciones a rotar.
+     * @param turno Turno para filtrar guías disponibles ("manana", "tarde", etc.).
      */
     void AsignarGuias(const std::vector<GestorDatos::Guia>& guias,
                       const std::vector<GestorDatos::Sala>& salas,
                       const std::vector<GestorDatos::Rol>& roles,
                       const int cantidadRotacion,
                       const std::string& turno);
-    
-    void GeneradorRol::AplicarCambiosInternos(
-    const std::vector<GestorDatos::Guia>& guias,
-    const std::vector<GestorDatos::Sala>& salas);
 
-    
     /**
-     * @brief Reasigna dos guías intercambiando sus salas.
+     * @brief Reasigna guías a salas si no cumplen requisitos de capacitación.
      * 
-     * @param rol1 Primer rol a intercambiar.
-     * @param rol2 Segundo rol a intercambiar.
+     * Aplica cambios internos:
+     * - Se mueven guías de salas no críticas a salas obligatorias.
+     * - Se intercambian guías que no tienen capacitación con guías válidos.
      */
-    void ReasignarGuias(GestorDatos::Rol& rol1, GestorDatos::Rol& rol2);
+    void AplicarCambiosInternos(
+        const std::vector<GestorDatos::Guia>& guias,
+        const std::vector<GestorDatos::Sala>& salas);
 
 public:
-    /**
-     * @brief Constructor por defecto del generador de roles.
-     */
+    /** @brief Constructor por defecto. */
     GeneradorRol() = default;
 
     /**
      * @brief Genera los roles del día actual usando los datos del sistema.
      * 
-     * @param datos Gestor que contiene toda la información del sistema.
-     * @return Vector con los roles generados válidos.
+     * Flujo general:
+     * 1) Generación del rol desplazado según rotación y turno.
+     * 2) Aplicación de cambios internos (capacitación, salas obligatorias).
+     * 3) Posibilidad de reflejar cambios externos (otros turnos) si es necesario.
+     * 
+     * @param datos Gestor que contiene toda la información de guías, salas y roles previos.
+     * @return Vector con los roles generados válidos para el día.
      */
     std::vector<GestorDatos::RolGenerado> generarRoles(const GestorDatos& datos);
 };
