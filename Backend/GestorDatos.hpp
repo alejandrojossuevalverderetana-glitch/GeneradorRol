@@ -56,8 +56,21 @@ public:
         std::string guiaTarde;
         std::string guiaManana;
     };
-
-    int valor;
+    /**
+     * @brief Representa la lista de operadores.
+     */
+    struct Operadores{
+        std::string operador1;
+        std::string operador2;
+    };
+        /**
+     * @brief Representa el turno que se va a generar.
+     */
+    std::string turno;
+        /**
+     * @brief Representa la cantidad de espacios que debe bajar el rol.
+     */
+    int valorRotacion;
 
     /**
      * @brief Constructor del GestorDatos.

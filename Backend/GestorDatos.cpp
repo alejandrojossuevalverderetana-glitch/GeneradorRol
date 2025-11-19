@@ -52,6 +52,18 @@ GestorDatos::GestorDatos(const nlohmann::json& AppData)
     }
     // --- Cargar rotacion ---
     if (AppData.contains("valor") && AppData["valor"].is_number_integer()) {
-    valor = AppData["valor"].get<int>();
+    valorRotacion = AppData["valor"].get<int>();
     }
+    // --- Cargar operadores ---
+    if (AppData.contains("operadores") && AppData["operadores"].is_array()) {
+        for (const auto& item : AppData["operadores"]) {
+            Operadores op;
+            op.operador1 = item.value("operador1", "");
+            op.operador2 = item.value("operador2", "");
+        }
+    }
+    // --- Cargar turno ---
+    if (AppData.contains("turno") && AppData["turno"].is_string()) {
+        turno = AppData["turno"].get<std::string>();
+    }   
 }
