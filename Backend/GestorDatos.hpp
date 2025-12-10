@@ -63,6 +63,9 @@ public:
         std::string operador1;
         std::string operador2;
     };
+
+    Operadores operadores;
+
         /**
      * @brief Representa el turno que se va a generar.
      */
