@@ -49,7 +49,9 @@ int main() {
         for (const auto& rol : nuevosRoles) {
             respuesta["roles"].push_back({
                 {"nombreGuia", rol.nombreGuia},
-                {"nombreSala", rol.nombreSala}
+                {"nombreSala", rol.nombreSala},
+                {"nombreCambioInterno", rol.nombreCambioInterno},
+                {"nombreCambioAprobado", rol.nombreCambioAprobado}
             });
         }
 
