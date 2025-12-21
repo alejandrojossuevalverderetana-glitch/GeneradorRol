@@ -66,6 +66,13 @@ public:
 
     Operadores operadores;
 
+    struct Vacaciones{
+        std::string vacacion1;
+        std::string vacacion2;
+    };
+
+    Vacaciones vacaciones;
+
         /**
      * @brief Representa el turno que se va a generar.
      */

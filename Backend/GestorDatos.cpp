@@ -1,7 +1,7 @@
 #include "GestorDatos.hpp"
 
 GestorDatos::GestorDatos(const nlohmann::json& AppData)
-    : guias(), salas(), roles(), cambios() // Inicializamos vectores vacíos
+    : guias(), salas(), roles(), cambios() 
 {
     int contadorSala = 0;
     // --- Cargar guías ---
@@ -30,6 +30,20 @@ GestorDatos::GestorDatos(const nlohmann::json& AppData)
             salas.push_back(s);
         }
     }
+    // --- Salas adicionales fijas ---
+    auto agregarSalaFija = [&](const std::string& nombre) {
+        Sala s;
+        s.nombre = nombre;
+        s.capacitacion = "";      // No requieren capacitación
+        s.obligatoria = false;    // No son obligatorias
+        s.numero = contadorSala++;
+        salas.push_back(s);
+    };
+
+    agregarSalaFija("operador1");
+    agregarSalaFija("operador2");
+    agregarSalaFija("vacaciones1");
+    agregarSalaFija("vacaciones2");
 
     // --- Cargar roles ---
     if (AppData.contains("roles") && AppData["roles"].is_array()) {
@@ -56,14 +70,18 @@ GestorDatos::GestorDatos(const nlohmann::json& AppData)
     }
     // --- Cargar operadores ---
     if (AppData.contains("operadores") && AppData["operadores"].is_array()) {
-        for (const auto& item : AppData["operadores"]) {
-            Operadores op;
-            op.operador1 = item.value("operador1", "");
-            op.operador2 = item.value("operador2", "");
-        }
+        const auto& item = AppData["operadores"][0]; 
+        operadores.operador1 = item.value("operador1", "");
+        operadores.operador2 = item.value("operador2", "");
     }
     // --- Cargar turno ---
     if (AppData.contains("turno") && AppData["turno"].is_string()) {
         turno = AppData["turno"].get<std::string>();
     }   
+    // --- Cargar vacaciones ---
+    if (AppData.contains("vacaciones") && AppData["vacaciones"].is_array()) {
+        const auto& item = AppData["vacaciones"][0]; 
+        vacaciones.vacacion1 = item.value("vacaciones1", "");
+        vacaciones.vacacion2 = item.value("vacaciones2", "");
+    } 
 }
