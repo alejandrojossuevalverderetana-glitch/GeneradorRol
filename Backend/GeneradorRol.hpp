@@ -21,6 +21,60 @@
  */
 class GeneradorRol {
 private:
+
+    /**
+     * @brief Determina si un guía corresponde a un operador o a una vacación.
+     * 
+     * Esta función centraliza la lógica para identificar guías que:
+     * - Están asignados como operadores.
+     * - Se encuentran en periodo de vacaciones.
+     * 
+     * Los guías identificados por esta función:
+     * - No deben ser utilizados como reemplazo en cambios internos.
+     * - Solo pueden permanecer asignados si se encuentran en su sala específica.
+     * 
+     * @param nombreGuia Nombre del guía a evaluar.
+     * @param operadores Estructura que contiene los guías asignados como operadores.
+     * @param vacaciones Estructura que contiene los guías en vacaciones.
+     * @return true si el guía es operador o está en vacaciones, false en caso contrario.
+     */
+    bool EsOperadorOVacacion(
+        const std::string& nombreGuia,
+        const GestorDatos::Operadores& operadores,
+        const GestorDatos::Vacaciones& vacaciones
+    );
+
+        /**
+     * @brief Verifica si un guía operador o en vacaciones se encuentra en su sala correspondiente.
+     * 
+     * Esta función valida que los guías especiales (operadores o vacaciones)
+     * estén asignados únicamente a su sala designada:
+     * - operador1  → sala "operador1"
+     * - operador2  → sala "operador2"
+     * - vacacion1  → sala "vacaciones1"
+     * - vacacion2  → sala "vacaciones2"
+     * 
+     * Para guías normales (no operadores ni vacaciones), la función siempre
+     * retorna true, ya que pueden ocupar cualquier sala compatible.
+     * 
+     * Esta validación es utilizada tanto en:
+     * - Comprobación de asignaciones.
+     * - Búsqueda de guías válidos para reemplazo.
+     * 
+     * @param nombreGuia Nombre del guía evaluado.
+     * @param nombreSala Nombre de la sala donde está asignado.
+     * @param operadores Estructura que define los operadores del día.
+     * @param vacaciones Estructura que define las vacaciones del día.
+     * @return true si el guía está correctamente ubicado, false si debe aplicarse un cambio interno.
+     */
+    bool EstaEnSalaCorrecta(
+        const std::string& nombreGuia,
+        const std::string& nombreSala,
+        const GestorDatos::Operadores& operadores,
+        const GestorDatos::Vacaciones& vacaciones
+    );
+
+
     /** @brief Lista interna con los roles generados. */
     std::vector<GestorDatos::RolGenerado> rolesGenerados;
 
@@ -58,6 +112,7 @@ private:
         const std::vector<GestorDatos::Sala>& salas,
         const std::vector<GestorDatos::RolGenerado>& roles,
         const GestorDatos::Operadores& operadores,
+        const GestorDatos::Vacaciones& vacaciones,
         const std::string& turno
     );
 
@@ -81,6 +136,7 @@ private:
         const std::vector<GestorDatos::Guia>& guias,
         const std::vector<GestorDatos::RolGenerado>& rolesGenerados,
         const GestorDatos::Operadores& operadores,
+        const GestorDatos::Vacaciones& vacaciones,
         const std::vector<GestorDatos::Sala>& salas,
         const std::string& turno);
 
@@ -108,7 +164,6 @@ private:
                       const std::vector<GestorDatos::Sala>& salas,
                       const std::vector<GestorDatos::Rol>& roles,
                       const int cantidadRotacion,
-                      const GestorDatos::Operadores& operadores,
                       const std::string& turno);
 
     /**
@@ -126,6 +181,7 @@ private:
         const std::vector<GestorDatos::Guia>& guias,
         const std::vector<GestorDatos::Sala>& salas,
         const GestorDatos::Operadores& operadores,
+        const GestorDatos::Vacaciones& vacaciones,
         const std::string& turno);
 
 public:
