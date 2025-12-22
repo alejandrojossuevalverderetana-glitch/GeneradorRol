@@ -69,8 +69,8 @@ GestorDatos::GestorDatos(const nlohmann::json& AppData)
     valorRotacion = AppData["valor"].get<int>();
     }
     // --- Cargar operadores ---
-    if (AppData.contains("operadores") && AppData["operadores"].is_array()) {
-        const auto& item = AppData["operadores"][0]; 
+    if (AppData.contains("operadores") && AppData["operadores"].is_object()) {
+        const auto& item = AppData["operadores"]; 
         operadores.operador1 = item.value("operador1", "");
         operadores.operador2 = item.value("operador2", "");
     }
@@ -79,8 +79,8 @@ GestorDatos::GestorDatos(const nlohmann::json& AppData)
         turno = AppData["turno"].get<std::string>();
     }   
     // --- Cargar vacaciones ---
-    if (AppData.contains("vacaciones") && AppData["vacaciones"].is_array()) {
-        const auto& item = AppData["vacaciones"][0]; 
+    if (AppData.contains("vacaciones") && AppData["vacaciones"].is_object()) {
+        const auto& item = AppData["vacaciones"]; 
         vacaciones.vacacion1 = item.value("vacaciones1", "");
         vacaciones.vacacion2 = item.value("vacaciones2", "");
     } 
