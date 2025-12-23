@@ -510,8 +510,8 @@ void GeneradorRol::AplicarCambiosInternos(
             std::swap(salaInvalida->nombreGuia, salaReemplazo->nombreGuia);
 
             // Marcar cambio interno en ambas
-            salaInvalida->nombreCambioInterno = guiaEntra;
-            salaReemplazo->nombreCambioInterno = guiaSale;
+            salaInvalida->nombreCambioInterno = guiaSale;
+            salaReemplazo->nombreCambioInterno = guiaEntra;
         }
     }
 }
