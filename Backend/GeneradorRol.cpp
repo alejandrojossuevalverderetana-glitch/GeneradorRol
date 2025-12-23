@@ -345,6 +345,25 @@ std::vector<GestorDatos::RolGenerado> GeneradorRol::ComprobarAsignacion(
                 invalidos.push_back(rol);
         }
     }
+    // =============================
+    // DEBUG: imprimir asignaciones inválidas
+    // =============================
+    if (!invalidos.empty())
+    {
+        std::cout << "\n[DEBUG] Asignaciones inválidas detectadas:\n";
+
+        for (const auto& rol : invalidos)
+        {
+            std::cout
+                << "  Sala: " << (rol.nombreSala.empty() ? "(sin sala)" : rol.nombreSala)
+                << " | Guía: " << (rol.nombreGuia.empty() ? "(sin guía)" : rol.nombreGuia)
+                << '\n';
+        }
+    }
+    else
+    {
+        std::cout << "\n[DEBUG] No se detectaron asignaciones inválidas.\n";
+    }
 
     return invalidos;
 }
@@ -466,15 +485,33 @@ void GeneradorRol::AplicarCambiosInternos(
             continue; // no se encontró forma de corregir
 
         // ======================
-        // 5) Aplicar el cambio interno
+        // 5) Aplicar el cambio interno (BIDIRECCIONAL)
         // ======================
+        std::string guiaSale = rolInvalido.nombreGuia;
+        std::string guiaEntra = guiaReemplazo;
+
+        GestorDatos::RolGenerado* salaInvalida = nullptr;
+        GestorDatos::RolGenerado* salaReemplazo = nullptr;
+
+        // Buscar ambas salas involucradas
         for (auto& r : rolesGenerados)
         {
             if (r.nombreSala == rolInvalido.nombreSala)
-            {
-                r.nombreCambioInterno = guiaReemplazo;
-                break;
-            }
+                salaInvalida = &r;
+
+            if (r.nombreGuia == guiaEntra)
+                salaReemplazo = &r;
+        }
+
+        // Aplicar swap solo si ambas existen
+        if (salaInvalida && salaReemplazo)
+        {
+            // Intercambio real
+            std::swap(salaInvalida->nombreGuia, salaReemplazo->nombreGuia);
+
+            // Marcar cambio interno en ambas
+            salaInvalida->nombreCambioInterno = guiaEntra;
+            salaReemplazo->nombreCambioInterno = guiaSale;
         }
     }
 }
