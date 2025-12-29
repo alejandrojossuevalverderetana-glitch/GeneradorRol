@@ -23,7 +23,7 @@ bool GeneradorRol::ValidarDisponibilidad(const std::vector<GestorDatos::Guia>& g
         }
     }
 
-    return guiasValidos >= obligatorias;
+    return guiasValidos > obligatorias;
 }
 
 /**
@@ -95,12 +95,20 @@ std::vector<GestorDatos::Guia> GeneradorRol::BuscarGuiasValidos(
             continue;
 
         // 3️⃣ Verificar capacitación necesaria
-        bool tieneCap = std::find(g.capacitaciones.begin(),
-                                  g.capacitaciones.end(),
-                                  sala.capacitacion) != g.capacitaciones.end();
+       bool requiereCap = !sala.capacitacion.empty();
+        // Si la sala no requiere capacitación, cualquier guía es válido
 
-        if (!tieneCap)
-            continue;
+        if (requiereCap)
+        {
+            bool tieneCap = std::find(
+                g.capacitaciones.begin(),
+                g.capacitaciones.end(),
+                sala.capacitacion) != g.capacitaciones.end();
+
+            if (!tieneCap)
+                continue;
+        }
+
 
         // 4️⃣ Verificar si el guía ya está asignado a otra sala con capacitación
         bool yaAsignado = false;
@@ -269,18 +277,14 @@ std::vector<GestorDatos::RolGenerado> GeneradorRol::ComprobarAsignacion(
 
     for (const auto& rol : roles)
     {
+        bool invalido = false;
         // =============================
         // 1) Buscar información de la sala
         // =============================
         auto itSala = std::find_if(salas.begin(), salas.end(),
                                    [&](const GestorDatos::Sala& s)
                                    { return s.nombre == rol.nombreSala; });
-
-        if (itSala == salas.end())
-        {
-            invalidos.push_back(rol); // Sala inexistente = asignación inválida
-            continue;
-        }
+ 
 
         const auto& sala = *itSala;
 
@@ -291,6 +295,8 @@ std::vector<GestorDatos::RolGenerado> GeneradorRol::ComprobarAsignacion(
         {
             // Si NO hay guía y la sala es obligatoria → inválido
             if (sala.obligatoria)
+                invalido = true;
+            if (invalido)
                 invalidos.push_back(rol);
 
             continue; // si no es obligatoria, un vacío es válido
@@ -303,37 +309,21 @@ std::vector<GestorDatos::RolGenerado> GeneradorRol::ComprobarAsignacion(
                                    [&](const GestorDatos::Guia& g)
                                    { return g.nombre == rol.nombreGuia; });
 
-        if (itGuia == guias.end())
-        {
-            invalidos.push_back(rol);
-            continue;
-        }
-
         const auto& guia = *itGuia;
 
         // =============================
-        // 4) Verificar operadores y vacaciones (CORREGIDO)
+        // 4) Verificar operadores y vacaciones
         // =============================
         if (EsOperadorOVacacion(guia.nombre, operadores, vacaciones))
         {
             if (!EstaEnSalaCorrecta(guia.nombre, sala.nombre, operadores, vacaciones))
-            {
-                invalidos.push_back(rol);
-                continue;
-            }
+                invalido = true;
+            
         }
 
-        // =============================
-        // 5) Filtrar por turno
-        // =============================
-        if (guia.turno != turno)
-        {
-            invalidos.push_back(rol);
-            continue;
-        }
 
         // =============================
-        // 6) Verificar capacitación necesaria
+        // 5) Verificar capacitación necesaria
         // =============================
         if (!sala.capacitacion.empty())
         {
@@ -342,8 +332,11 @@ std::vector<GestorDatos::RolGenerado> GeneradorRol::ComprobarAsignacion(
                           sala.capacitacion) != guia.capacitaciones.end();
 
             if (!tieneCap)
-                invalidos.push_back(rol);
+                invalido = true;
         }
+        if (invalido)
+            invalidos.push_back(rol);
+
     }
     // =============================
     // DEBUG: imprimir asignaciones inválidas
@@ -364,7 +357,7 @@ std::vector<GestorDatos::RolGenerado> GeneradorRol::ComprobarAsignacion(
     {
         std::cout << "\n[DEBUG] No se detectaron asignaciones inválidas.\n";
     }
-
+    
     return invalidos;
 }
 
@@ -401,9 +394,6 @@ void GeneradorRol::AplicarCambiosInternos(
         auto itSala = std::find_if(
             salas.begin(), salas.end(),
             [&](const GestorDatos::Sala& s) { return s.nombre == rolInvalido.nombreSala; });
-
-        if (itSala == salas.end())
-            continue;
 
         const auto& sala = *itSala;
 
@@ -485,13 +475,13 @@ void GeneradorRol::AplicarCambiosInternos(
             continue; // no se encontró forma de corregir
 
         // ======================
-        // 5) Aplicar el cambio interno (BIDIRECCIONAL)
+        // 5) Aplicar cambio interno lógico (SIN swap real)
         // ======================
-        std::string guiaSale = rolInvalido.nombreGuia;
+        std::string guiaSale  = rolInvalido.nombreGuia;
         std::string guiaEntra = guiaReemplazo;
 
-        GestorDatos::RolGenerado* salaInvalida = nullptr;
-        GestorDatos::RolGenerado* salaReemplazo = nullptr;
+        GestorDatos::RolGenerado* salaInvalida   = nullptr;
+        GestorDatos::RolGenerado* salaReemplazo  = nullptr;
 
         // Buscar ambas salas involucradas
         for (auto& r : rolesGenerados)
@@ -503,15 +493,15 @@ void GeneradorRol::AplicarCambiosInternos(
                 salaReemplazo = &r;
         }
 
-        // Aplicar swap solo si ambas existen
-        if (salaInvalida && salaReemplazo)
+        // Registrar cambio lógico (sin mover guías)
+        if (salaInvalida)
         {
-            // Intercambio real
-            std::swap(salaInvalida->nombreGuia, salaReemplazo->nombreGuia);
+            salaInvalida->nombreCambioInterno = guiaEntra;
+        }
 
-            // Marcar cambio interno en ambas
-            salaInvalida->nombreCambioInterno = guiaSale;
-            salaReemplazo->nombreCambioInterno = guiaEntra;
+        if (salaReemplazo)
+        {
+            salaReemplazo->nombreCambioInterno = guiaSale;
         }
     }
 }
