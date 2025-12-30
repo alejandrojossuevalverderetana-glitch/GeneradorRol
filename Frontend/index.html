@@ -30,6 +30,8 @@
             <tr>
               <th>Sala</th>
               <th>Guía</th>
+              <th>Cambio Interno</th>
+              <th>Cambio Externo</th>
             </tr>
           </thead>
           <tbody></tbody>
@@ -62,17 +64,22 @@
           <legend>Operadores</legend>
           <div id="editOperadores"></div>
         </fieldset>
+        <fieldset>
+          <legend>Vacaciones</legend>
+          <div id="editVacaciones"></div>
+        </fieldset>
+        <!-- Cambios externos para futuro -->
         <div>
-          <label> Cambios: </label>
-            <table id="cambiosContainer">
+          <label class = "hidden"> Cambios: </label>
+            <table id="cambiosContainer" class="hidden">
             <tr>
               <th>Guia Tarde</th>
               <th>Guia Mañana</th>
             </tr>
             </table>
-          <button type="button" id="agregarCambio" class="magic-btn">➕ Agregar Cambio</button>
+          <button type="button" id="agregarCambio" class="magic-btn hidden">➕ Agregar Cambio</button>
         </div>
-          
+        
 
       
   <div class="form-container hidden" id="cambiosForm">
@@ -146,6 +153,7 @@
           <tr>
             <th>Nombre</th>
             <th>Capacitación</th>
+            <th>Obligatoria</th>
             <th>Acciones</th>
           </tr>
         </thead>
@@ -158,16 +166,30 @@
     <section id="salaEditPage" class="adminPage hidden">
       <h2>✏️ Editar Sala</h2>
       <form id="FormSala">
-        <label>Nombre: <input type="text" id="editNombreSala" /></label><br>
-        <label>Capacitación:
-          <select id="editCapacitacion"><option value="">N/A</option></select>
+        <label>
+          Nombre:
+          <input type="text" id="editNombreSala" />
         </label><br>
+
+        <label>
+          Capacitación:
+          <select id="editCapacitacion">
+            <option value="">N/A</option>
+          </select>
+        </label><br>
+
+        <label>
+          <input type="checkbox" id="editSalaObligatoria" />
+          Sala obligatoria
+        </label><br>
+
         <div class="form-buttons">
           <button type="button" id="guardarSala" class="magic-btn">✅ Guardar</button>
           <button type="button" class="cerrarPage cancel-btn">❌ Cancelar</button>
         </div>
       </form>
     </section>
+
 
     <!-- ADMINISTRAR CAPACITACIONES -->
     <section id="capacitacionesPage" class="adminPage hidden">

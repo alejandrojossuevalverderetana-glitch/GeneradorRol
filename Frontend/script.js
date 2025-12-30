@@ -21,6 +21,10 @@ const App = (() => {
     salas: [ { nombre: "Universo", capacitacion: "" }, { nombre: "Tierra", capacitacion: "" }, { nombre: "Costa Rica", capacitacion: "" }, { nombre: "Estadio", capacitacion: "" }, { nombre: "Radio", capacitacion: "Radio" }, { nombre: "Television", capacitacion: "Tele" }, { nombre: "Steam", capacitacion: "Steam" } ],
     capacitaciones: ["Tele", "Radio", "Steam", "Operador"],
     roles: [],
+    vacaciones: [],
+    operadores: [],
+    valor: 5,
+    turno: "mañana",
     actual: {
       guia: null,
       sala: null,
@@ -41,6 +45,11 @@ const storage = {
       capacitaciones: state.capacitaciones,
       roles: state.roles,
       cambios: state.cambios,
+      vacaciones: state.vacaciones,
+      operadores: state.operadores,
+      valor: state.valor    ,
+      turno : state.turno  
+
       };
     localStorage.setItem(storage.key, JSON.stringify(data));
     console.log("✅ Datos guardados en localStorage");
@@ -56,6 +65,10 @@ const storage = {
       state.capacitaciones = data.capacitaciones || [];
       state.roles = data.roles || [];
       state.cambios = data.cambios || [];
+      state.vacaciones = data.vacaciones || [];
+      state.operadores = data.operadores || [];
+      state.valor = data.valor ?? 5;
+      state.turno = data.turno || "mañana";
       console.log("✅ Datos cargados desde localStorage");
     } catch (e) {
       console.error("⚠️ Error cargando datos:", e);
@@ -139,7 +152,10 @@ const storage = {
         const tr = document.createElement("tr");
         tr.innerHTML = `
           <td>${s.nombre}</td>
-          <td>${s.capacitacion}</td>
+          <td>${s.capacitacion}
+          <td style="text-align:center; font-size: 1.2em;">
+            ${s.obligatoria ? "✅" : "❌"}
+          </td>
           <td>
             <button class="editar" data-index="${i}" data-type="sala">✏️</button>
             <button class="eliminar" data-index="${i}" data-type="sala">🗑️</button>
@@ -171,6 +187,8 @@ const storage = {
         tr.innerHTML = `
           <td>${r.nombreSala}</td>
           <td>${r.nombreGuia}</td>
+          <td>${r.nombreCambioInterno}</td>
+          <td>${r.nombreCambioExterno}</td>
         `;
         tbody.appendChild(tr);
       });
@@ -187,13 +205,35 @@ const storage = {
 
     tabla.innerHTML = `
       <tr>
-        <th>Guía Mañana</th>
-        <th>Guía Tarde</th>
+        <th> (PROXIMAMENTE) </th>
       </tr>
       ${filas}
     `;
 
-    tabla.classList.remove("hidden");
+    // tabla.classList.remove("hidden");
+  },
+  vacaciones: (turno) => {
+    const container = document.getElementById("editVacaciones");
+      container.innerHTML = "";
+
+      const guiasTurno = state.guias.filter(g =>
+        turno.startsWith("fines")
+          ? g.turno.includes(turno.split("-")[1])
+          : g.turno === turno || g.turno.includes("TC")
+      );
+
+      guiasTurno.forEach(g => {
+        const checked = state.vacaciones.some(
+          v => v.nombreGuia === g.nombre && v.turno === turno
+        );
+
+        const label = document.createElement("label");
+        label.innerHTML = `
+          <input type="checkbox" value="${g.nombre}" ${checked ? "checked" : ""}>
+          ${g.nombre}
+        `;
+        container.appendChild(label);
+      }); 
   }
 
 
@@ -238,7 +278,7 @@ const storage = {
     abrirRol: () => {
       const container = document.getElementById("editOperadores");
       container.innerHTML = ""; 
-      const turno = dom.editTurno.value;
+      const turno = state.turno;
 
       let operadores;
 
@@ -247,7 +287,11 @@ const storage = {
         const subTurno = partes[1];
         operadores = state.guias.filter(g => g.capacitaciones.includes("Operador") && g.turno.includes(subTurno));
       }else {
-        operadores = state.guias.filter(g => g.capacitaciones.includes("Operador") && g.turno === turno || g.turno.includes("TC"));
+        operadores = state.guias.filter(
+          g =>
+          g.capacitaciones.includes("Operador") &&
+          (g.turno === turno || g.turno.includes("TC"))
+        );
       }
 
       operadores.forEach(op => {
@@ -258,6 +302,7 @@ const storage = {
 
       dom.rolEditPage.classList.remove("hidden");
       render.cambios(state.cambios, dom.cambiosContainer)
+      render.vacaciones(turno)
     }
 
 
@@ -336,10 +381,21 @@ async function generarRoles() {
     try {
         // Preparar los datos que enviarás al servidor (puedes ajustarlo según tu estructura)
         const payload = {
+            turno: state.turno,
+            valorRotacion: state.valor,
             guias: state.guias,   // lista de guías
             salas: state.salas,   // lista de salas
             roles: state.roles,   // roles actuales, si aplica
-            cambios: state.cambios // cambios si los tienes
+            cambios: state.cambios, // cambios si los tienes
+            operadores: {
+              operador1: state.operadores[0] || "",
+              operador2: state.operadores[1] || ""
+            },
+
+            vacaciones: {
+              vacacion1: state.vacaciones[0]?.nombreGuia || "",
+              vacacion2: state.vacaciones[1]?.nombreGuia || ""
+            }  
         };
 
         // Petición POST al endpoint /generar de tu API
@@ -361,7 +417,9 @@ async function generarRoles() {
         // Guardar los roles generados en el estado
         state.roles = data.roles.map(r => ({
             nombreSala: r.nombreSala,
-            nombreGuia: r.nombreGuia
+            nombreGuia: r.nombreGuia,
+            nombreCambioInterno: r.nombreCambioInterno,
+            nombreCambioExterno: r.nombreCambioExterno
         }));
 
         // Mostrar roles en el DOM
@@ -376,8 +434,8 @@ async function generarRoles() {
 
 
   const exportarCSV = () => {
-    let csvContent = "\uFEFFSala;Guía\n";
-    state.roles.forEach(r => csvContent += `${r.sala};${r.guia}\n`);
+    let csvContent = "\uFEFFSala;Guía;Cambio Interno;Cambio Externo\n";
+    state.roles.forEach(r => csvContent += `${r.nombreSala};${r.nombreGuia};${r.nombreCambioInterno};${r.nombreCambioExterno}\n`);
 
     const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
     const link = document.createElement("a");
@@ -450,14 +508,22 @@ async function generarRoles() {
     dom.cancelBtn.onclick = () => { dom.rolesContainer.classList.add("hidden"); dom.btnRol.classList.remove("hidden"); };
 
     dom.rolSlider.oninput = () => {
-      const val = dom.rolSlider.value; 
+      const val = Number(dom.rolSlider.value);
+
+      // 1️⃣ Guardar en el estado
+      state.valor = val;
+
+      // 2️⃣ Actualizar UI
       dom.sliderValue.textContent = val;
 
       const porcentaje = (val / dom.rolSlider.max) * 100;
-      dom.rolSlider.style.background = `linear-gradient(to right, #FFCC33 ${porcentaje-10}%, #ddd ${porcentaje}%)`;
+      dom.rolSlider.style.background =
+        `linear-gradient(to right, #FFCC33 ${porcentaje - 10}%, #ddd ${porcentaje}%)`;
     };
 
-    dom.editTurno.onchange = () => {forms.abrirRol()}
+    dom.editTurno.onchange = () => {
+      state.turno = dom.editTurno.value;
+      forms.abrirRol()}
 
     document.addEventListener("click", e => {
       if (e.target.matches(".editar")) {
@@ -484,6 +550,14 @@ async function generarRoles() {
   return {
     init: () => {
       storage.cargar();
+      dom.editTurno.value = state.turno;
+      dom.rolSlider.value = state.valor;
+      dom.sliderValue.textContent = state.valor;
+
+      const porcentaje = (state.valor / dom.rolSlider.max) * 100;
+      dom.rolSlider.style.background =
+        `linear-gradient(to right, #FFCC33 ${porcentaje - 10}%, #ddd ${porcentaje}%)`;
+
       initEvents();
       console.log("✅ App iniciada");
     }
