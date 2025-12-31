@@ -16,22 +16,118 @@ const App = (() => {
 // 🗂 Estado de la aplicación
 // Se almacenan datos principales: guías, salas, capacitaciones, roles generados y elementos seleccionados actualmente
 // =====================================================
-  const state = {
-    guias: [ { nombre: "Ana", turno: "mañana", capacitaciones: ["Tele", "Operador"] }, { nombre: "Pedro", turno: "mañana", capacitaciones: ["Tele", "Operador"] }, { nombre: "Juan", turno: "mañana", capacitaciones: ["Tele", "Operador"] }, { nombre: "Salem", turno: "tarde", capacitaciones: ["Tele", "Operador"] }, { nombre: "Luis", turno: "tarde", capacitaciones: ["Tele", "Radio"] }, { nombre: "María", turno: "tarde", capacitaciones: ["Tele", "Radio"] } ], 
-    salas: [ { nombre: "Universo", capacitacion: "" }, { nombre: "Tierra", capacitacion: "" }, { nombre: "Costa Rica", capacitacion: "" }, { nombre: "Estadio", capacitacion: "" }, { nombre: "Radio", capacitacion: "Radio" }, { nombre: "Television", capacitacion: "Tele" }, { nombre: "Steam", capacitacion: "Steam" } ],
+  const state =   {
+  guias: [
+    // ======================
+    // TURNO MAÑANA
+    // ======================
+    { nombre: "Ana",     turno: "mañana", capacitaciones: ["Tele", "Operador"] },
+    { nombre: "Pedro",   turno: "mañana", capacitaciones: ["Radio"] },
+    { nombre: "Juan",    turno: "mañana", capacitaciones: ["Tele"] },
+    { nombre: "Lucía",   turno: "mañana", capacitaciones: [] },
+    { nombre: "Carlos",  turno: "mañana", capacitaciones: ["Steam"] },
+    { nombre: "Sofía",   turno: "mañana", capacitaciones: ["Radio", "Tele"] },
+    { nombre: "Diego",   turno: "mañana", capacitaciones: [] },
+    { nombre: "Valeria", turno: "mañana", capacitaciones: ["Tele"] },
+    { nombre: "Andrés",  turno: "mañana", capacitaciones: ["Radio"] },
+
+    // ======================
+    // TURNO TARDE
+    // ======================
+    { nombre: "Salem",   turno: "tarde", capacitaciones: ["Tele", "Operador"] },
+    { nombre: "Luis",    turno: "tarde", capacitaciones: ["Radio"] },
+    { nombre: "María",   turno: "tarde", capacitaciones: ["Tele"] },
+    { nombre: "Paula",   turno: "tarde", capacitaciones: [] },
+    { nombre: "Jorge",   turno: "tarde", capacitaciones: ["Steam"] },
+    { nombre: "Elena",   turno: "tarde", capacitaciones: ["Radio", "Tele"] },
+    { nombre: "Ricardo", turno: "tarde", capacitaciones: [] },
+    { nombre: "Camila",  turno: "tarde", capacitaciones: ["Tele"] }
+  ],
+
+    salas: [
+      {
+        nombre: "Universo",
+        capacitacion: "",
+        obligatoria: true
+      },
+      {
+        nombre: "Tierra",
+        capacitacion: "",
+        obligatoria: true
+      },
+      {
+        nombre: "Costa Rica",
+        capacitacion: "",
+        obligatoria: false
+      },
+      {
+        nombre: "Estadio",
+        capacitacion: "",
+        obligatoria: false
+      },
+      {
+        nombre: "Radio",
+        capacitacion: "Radio",
+        obligatoria: true
+      },
+      {
+        nombre: "Television",
+        capacitacion: "Tele",
+        obligatoria: true
+      },
+      {
+        nombre: "Steam",
+        capacitacion: "Steam",
+        obligatoria: false
+      }
+    ],
+
     capacitaciones: ["Tele", "Radio", "Steam", "Operador"],
-    roles: [],
-    vacaciones: [],
-    operadores: [],
-    valor: 5,
+
+    // Roles temporales
+    roles: [
+      { nombreGuia: "Ana", nombreSala: "Universo" },
+      { nombreGuia: "Pedro", nombreSala: "Radio" },
+      { nombreGuia: "Juan", nombreSala: "Television" },
+      { nombreGuia: "Lucía", nombreSala: "Tierra" }
+    ],
+    // Roles anteriores, por turno
+    rolesAnteriores: {
+      manana: [],
+      tarde: [],
+      finesManana: [],
+      finesTarde: []
+    },
+
+    // Coincide con GestorDatos::Operadores
+    operadores: {
+      operador1: "Ana",
+      operador2: ""
+    },
+
+    // Coincide con GestorDatos::Vacaciones
+    vacaciones: {
+      vacacion1: "Pedro",
+      vacacion2: ""
+    },
+
+    // Rotación
+    valor: 2,
+
+    // Turno actual
     turno: "mañana",
+
+    // Estado UI
     actual: {
       guia: null,
       sala: null,
       capacitacion: null
     },
+
+    // Cambios externos (futuro)
     cambios: []
   };
+
   // =====================================================
 // 💾 Persistencia de datos
 // =====================================================
@@ -65,8 +161,16 @@ const storage = {
       state.capacitaciones = data.capacitaciones || [];
       state.roles = data.roles || [];
       state.cambios = data.cambios || [];
-      state.vacaciones = data.vacaciones || [];
-      state.operadores = data.operadores || [];
+      state.vacaciones = {
+        vacacion1: data.vacaciones?.vacacion1 || "",
+        vacacion2: data.vacaciones?.vacacion2 || ""
+      };
+
+      state.operadores = {
+        operador1: data.operadores?.operador1 || "",
+        operador2: data.operadores?.operador2 || ""
+      };
+
       state.valor = data.valor ?? 5;
       state.turno = data.turno || "mañana";
       console.log("✅ Datos cargados desde localStorage");
@@ -152,7 +256,7 @@ const storage = {
         const tr = document.createElement("tr");
         tr.innerHTML = `
           <td>${s.nombre}</td>
-          <td>${s.capacitacion}
+          <td>${s.capacitacion}</td>
           <td style="text-align:center; font-size: 1.2em;">
             ${s.obligatoria ? "✅" : "❌"}
           </td>
@@ -188,7 +292,7 @@ const storage = {
           <td>${r.nombreSala}</td>
           <td>${r.nombreGuia}</td>
           <td>${r.nombreCambioInterno}</td>
-          <td>${r.nombreCambioExterno}</td>
+          <td>${r.nombreCambioExterno || ""}</td>
         `;
         tbody.appendChild(tr);
       });
@@ -218,14 +322,14 @@ const storage = {
 
       const guiasTurno = state.guias.filter(g =>
         turno.startsWith("fines")
-          ? g.turno.includes(turno.split("-")[1])
-          : g.turno === turno || g.turno.includes("TC")
+          ? g.turno.includes(turno.split(" ")[1])
+          : g.turno === turno || g.turno.includes("entreSemana")
       );
 
       guiasTurno.forEach(g => {
-        const checked = state.vacaciones.some(
-          v => v.nombreGuia === g.nombre && v.turno === turno
-        );
+        const checked =
+          g.nombre === state.vacaciones.vacacion1 ||
+          g.nombre === state.vacaciones.vacacion2;
 
         const label = document.createElement("label");
         label.innerHTML = `
@@ -234,6 +338,13 @@ const storage = {
         `;
         container.appendChild(label);
       }); 
+      container.onchange = () => {
+        const checked = container.querySelectorAll("input:checked");
+        if (checked.length > 2) {
+          checked[checked.length - 1].checked = false;
+          alert("Solo se pueden seleccionar 2 guías en vacaciones.");
+        }
+      };
   }
 
 
@@ -260,6 +371,7 @@ const storage = {
     abrirSala: () => {
       const s = state.actual.sala;
       document.getElementById("editNombreSala").value = s ? s.nombre : "";
+      document.getElementById("editSalaObligatoria").checked = s?.obligatoria ?? false;
 
       const select = document.getElementById("editCapacitacion");
       select.innerHTML = '<option value="">N/A</option>';
@@ -290,15 +402,29 @@ const storage = {
         operadores = state.guias.filter(
           g =>
           g.capacitaciones.includes("Operador") &&
-          (g.turno === turno || g.turno.includes("TC"))
+          (g.turno === turno || g.turno.includes("entreSemana"))
         );
       }
 
       operadores.forEach(op => {
+        const checked =
+          op.nombre === state.operadores.operador1 ||
+          op.nombre === state.operadores.operador2;
+
         const label = document.createElement("label");
-        label.innerHTML = `<input type="checkbox" value="${op.nombre}"> ${op.nombre}`;
+        label.innerHTML = `
+          <input type="checkbox" value="${op.nombre}" ${checked ? "checked" : ""}>
+          ${op.nombre}
+        `;
         container.appendChild(label);
-      });
+        });
+        container.addEventListener("change", () => {
+          const checked = container.querySelectorAll("input:checked");
+          if (checked.length > 2) {
+            checked[checked.length - 1].checked = false;
+            alert("Solo se pueden seleccionar 2 operadores.");
+          }
+        });
 
       dom.rolEditPage.classList.remove("hidden");
       render.cambios(state.cambios, dom.cambiosContainer)
@@ -331,12 +457,19 @@ const storage = {
     guardarSala: () => {
       const nombre = document.getElementById("editNombreSala").value.trim();
       const capacitacion = document.getElementById("editCapacitacion").value;
+      const obligatoria = document.getElementById("editSalaObligatoria").checked;
       if (!nombre) return alert("El nombre no puede estar vacío");
 
       if (state.actual.sala) {
         state.actual.sala.nombre = nombre;
         state.actual.sala.capacitacion = capacitacion;
-      } else state.salas.push({ nombre, capacitacion });
+        state.actual.sala.obligatoria = obligatoria;
+      } 
+      else state.salas.push({ 
+        nombre, 
+        capacitacion, 
+        obligatoria
+      });
 
       dom.salaEditPage.classList.add("hidden");
       render.salas();
@@ -382,19 +515,19 @@ async function generarRoles() {
         // Preparar los datos que enviarás al servidor (puedes ajustarlo según tu estructura)
         const payload = {
             turno: state.turno,
-            valorRotacion: state.valor,
+            valor: state.valor,
             guias: state.guias,   // lista de guías
             salas: state.salas,   // lista de salas
-            roles: state.roles,   // roles actuales, si aplica
+            roles: state.rolesAnteriores[state.turno],   // roles actuales, si aplica
             cambios: state.cambios, // cambios si los tienes
             operadores: {
-              operador1: state.operadores[0] || "",
-              operador2: state.operadores[1] || ""
+              operador1: state.operadores.operador1 || "",
+              operador2: state.operadores.operador2 || ""
             },
 
             vacaciones: {
-              vacacion1: state.vacaciones[0]?.nombreGuia || "",
-              vacacion2: state.vacaciones[1]?.nombreGuia || ""
+              vacacion1: state.vacaciones.vacacion1 || "",
+              vacacion2: state.vacaciones.vacacion2 || ""
             }  
         };
 
@@ -468,8 +601,8 @@ async function generarRoles() {
   selectTarde.innerHTML = '<option value="" disabled selected>Guía tarde</option>';
 
   // Filtrar guías por turno
-  const guiasMañana = state.guias.filter(g => g.turno.includes("mañana"));
-  const guiasTarde = state.guias.filter(g => g.turno.includes("tarde"));
+  const guiasMañana = state.guias.filter(g => g.turno.includes("mañana") || g.turno.includes("entreSemana"));
+  const guiasTarde = state.guias.filter(g => g.turno.includes("tarde") || g.turno.includes("entreSemana"));
 
   // Agregar las opciones de mañana
   guiasMañana.forEach(g => {
@@ -503,8 +636,43 @@ async function generarRoles() {
 
     dom.cerrarBtns.forEach(btn => btn.onclick = () => btn.closest(".adminPage").classList.add("hidden"));
 
-    dom.guardarRol.onclick= () => {  dom.output.classList.remove("hidden");dom.rolEditPage.classList.add("hidden"); generarRoles(); };
-    dom.exportBtn.onclick = exportarCSV;
+    dom.guardarRol.onclick = () => {
+
+      // ==========================
+      // OPERADORES (máx 2)
+      // ==========================
+      const ops = Array.from(
+        document.querySelectorAll("#editOperadores input[type='checkbox']:checked")
+      ).map(c => c.value);
+
+      state.operadores.operador1 = ops[0] || "";
+      state.operadores.operador2 = ops[1] || "";
+
+      // ==========================
+      // VACACIONES (máx 2)
+      // ==========================
+      const vacs = Array.from(
+        document.querySelectorAll("#editVacaciones input[type='checkbox']:checked")
+      ).map(c => c.value);
+
+      state.vacaciones.vacacion1 = vacs[0] || "";
+      state.vacaciones.vacacion2 = vacs[1] || "";
+
+      // ==========================
+      // CERRAR + GENERAR
+      // ==========================
+      dom.output.classList.remove("hidden");
+      dom.rolEditPage.classList.add("hidden");
+
+      storage.guardar();
+      generarRoles();
+    };
+    dom.exportBtn.onclick = () => {
+      state.rolesAnteriores[state.turno] = JSON.parse(JSON.stringify(state.roles));
+      exportarCSV();
+    }
+      
+      
     dom.cancelBtn.onclick = () => { dom.rolesContainer.classList.add("hidden"); dom.btnRol.classList.remove("hidden"); };
 
     dom.rolSlider.oninput = () => {
