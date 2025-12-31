@@ -86,10 +86,6 @@ const App = (() => {
 
     // Roles temporales
     roles: [
-      { nombreGuia: "Ana", nombreSala: "Universo" },
-      { nombreGuia: "Pedro", nombreSala: "Radio" },
-      { nombreGuia: "Juan", nombreSala: "Television" },
-      { nombreGuia: "Lucía", nombreSala: "Tierra" }
     ],
     // Roles anteriores, por turno
     rolesAnteriores: {
@@ -101,13 +97,13 @@ const App = (() => {
 
     // Coincide con GestorDatos::Operadores
     operadores: {
-      operador1: "Ana",
+      operador1: "",
       operador2: ""
     },
 
     // Coincide con GestorDatos::Vacaciones
     vacaciones: {
-      vacacion1: "Pedro",
+      vacacion1: "",
       vacacion2: ""
     },
 
@@ -532,7 +528,7 @@ async function generarRoles() {
         };
 
         // Petición POST al endpoint /generar de tu API
-        const response = await fetch("http://araxus.ddns.net:18080/generar", {
+        const response = await fetch("https://araxus.ddns.net:18080/generar", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify(payload)
