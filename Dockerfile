@@ -1,7 +1,10 @@
 FROM ubuntu:22.04
 
 # Instalar dependencias
-RUN apt-get update && apt-get install -y g++ git curl build-essential
+RUN apt-get update && apt-get install -y \
+    g++ git curl build-essential \
+    libssl-dev
+
 
 WORKDIR /app
 
@@ -32,7 +35,7 @@ RUN git clone https://github.com/chriskohlhoff/asio.git /tmp/asio && \
 RUN g++ -std=c++17 \
     Backend/api.cpp Backend/GeneradorRol.cpp Backend/GestorDatos.cpp \
     -Icrow -Inlohmann -Icpp-httplib -Iasio \
-    -o api -lpthread
+    -o api -lpthread -lssl -lcrypto -DCROW_ENABLE_SSL
 
 EXPOSE 18080
 CMD ["./api"]
