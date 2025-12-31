@@ -327,12 +327,18 @@ const storage = {
           g.nombre === state.vacaciones.vacacion1 ||
           g.nombre === state.vacaciones.vacacion2;
 
-        const label = document.createElement("label");
-        label.innerHTML = `
-          <input type="checkbox" value="${g.nombre}" ${checked ? "checked" : ""}>
-          ${g.nombre}
-        `;
-        container.appendChild(label);
+          const label = document.createElement("label");
+          label.classList.add("checkbox-label"); // Clase para aplicar estilos
+
+          const input = document.createElement("input");
+          input.type = "checkbox";
+          input.value = g.nombre;
+          if (checked) input.checked = true;
+          input.classList.add("checkbox-input"); // Clase para aplicar estilos
+
+          label.appendChild(input);
+          label.appendChild(document.createTextNode(g.nombre));
+          container.appendChild(label);
       }); 
       container.onchange = () => {
         const checked = container.querySelectorAll("input:checked");
