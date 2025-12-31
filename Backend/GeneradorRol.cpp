@@ -18,7 +18,7 @@ bool GeneradorRol::ValidarDisponibilidad(const std::vector<GestorDatos::Guia>& g
     // Contar guías válidos:
     int guiasValidos = 0;
     for (const auto& g : guias) {
-        if (!GuiaValidoParaTurno(g.turno, turno)) {
+        if (GuiaValidoParaTurno(g.turno, turno)) {
             guiasValidos++;
         }
     }
@@ -104,7 +104,7 @@ std::vector<GestorDatos::Guia> GeneradorRol::BuscarGuiasValidos(
         }
 
         // 2️⃣ Verificar turno del guía vs turno de la sala
-        if (GuiaValidoParaTurno(g.turno, turno)) 
+        if (!GuiaValidoParaTurno(g.turno, turno)) 
             continue;
 
         // 3️⃣ Verificar capacitación necesaria
@@ -175,7 +175,7 @@ void GeneradorRol::AsignarGuias(const std::vector<GestorDatos::Guia>& guias,
     std::vector<std::string> guiasValidos;
     for (const auto& g : guias)
     {
-        if (GuiaValidoParaTurno(g.turno, turno)) continue;
+        if (!GuiaValidoParaTurno(g.turno, turno)) continue;
         guiasValidos.push_back(g.nombre);
     }
 
