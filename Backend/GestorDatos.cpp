@@ -35,7 +35,7 @@ GestorDatos::GestorDatos(const nlohmann::json& AppData)
         Sala s;
         s.nombre = nombre;
         s.capacitacion = "";      // No requieren capacitación
-        s.obligatoria = true;    // No son obligatorias
+        s.obligatoria = true;    // Son obligatorias
         s.numero = contadorSala++;
         salas.push_back(s);
     };
@@ -81,7 +81,7 @@ GestorDatos::GestorDatos(const nlohmann::json& AppData)
     // --- Cargar vacaciones ---
     if (AppData.contains("vacaciones") && AppData["vacaciones"].is_object()) {
         const auto& item = AppData["vacaciones"]; 
-        vacaciones.vacacion1 = item.value("vacaciones1", "");
-        vacaciones.vacacion2 = item.value("vacaciones2", "");
+        vacaciones.vacacion1 = item.value("vacacion1", "");
+        vacaciones.vacacion2 = item.value("vacacion2", "");
     } 
 }
