@@ -72,7 +72,7 @@ int main() {
 });
 
 
-    std::cout << "🟢 Servidor iniciado en http://0.0.0.0:8080 (localhost o IP pública)" << std::endl ;
+    std::cout << "🟢 Servidor iniciado en https://0.0.0.0:8080 (localhost o IP pública)" << std::endl ;
     app.bindaddr("0.0.0.0").port(8080)
     .ssl_file("/app/certs/fullchain.pem", "/app/certs/privkey.pem")
     .multithreaded()
