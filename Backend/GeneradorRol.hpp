@@ -74,6 +74,9 @@ private:
         const GestorDatos::Vacaciones& vacaciones
     );
 
+    bool GuiaValidoParaTurno(
+        const std::string& turnoGuia,
+        const std::string& turnoActual);
 
     /** @brief Lista interna con los roles generados. */
     std::vector<GestorDatos::RolGenerado> rolesGenerados;

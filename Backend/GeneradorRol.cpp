@@ -18,7 +18,7 @@ bool GeneradorRol::ValidarDisponibilidad(const std::vector<GestorDatos::Guia>& g
     // Contar guías válidos:
     int guiasValidos = 0;
     for (const auto& g : guias) {
-        if (g.turno.find(turno) != std::string::npos) {
+        if (!GuiaValidoParaTurno(g.turno, turno)) {
             guiasValidos++;
         }
     }
@@ -60,6 +60,19 @@ bool GeneradorRol::EstaEnSalaCorrecta(
     
     return true; // No es operador/vacación, está bien en cualquier sala
 }
+bool GeneradorRol::GuiaValidoParaTurno(
+        const std::string& turnoGuia,
+        const std::string& turnoActual){
+            // Dividir el turno actual en palabras (espacios)
+            std::istringstream ss(turnoActual);
+            std::string palabra;
+            while (ss >> palabra) {
+                if (turnoGuia.find(palabra) != std::string::npos) {
+                    return true; // Coincide al menos una palabra
+                }
+            }
+            return false; // No coincidió ninguna
+        }
 
 /**
  * @brief Busca guías que puedan ser asignados a una sala específica.
@@ -91,7 +104,7 @@ std::vector<GestorDatos::Guia> GeneradorRol::BuscarGuiasValidos(
         }
 
         // 2️⃣ Verificar turno del guía vs turno de la sala
-        if (g.turno != turno) 
+        if (GuiaValidoParaTurno(g.turno, turno)) 
             continue;
 
         // 3️⃣ Verificar capacitación necesaria
@@ -162,7 +175,7 @@ void GeneradorRol::AsignarGuias(const std::vector<GestorDatos::Guia>& guias,
     std::vector<std::string> guiasValidos;
     for (const auto& g : guias)
     {
-        if (g.turno.find(turno) == std::string::npos) continue;
+        if (GuiaValidoParaTurno(g.turno, turno)) continue;
         guiasValidos.push_back(g.nombre);
     }
 
@@ -195,7 +208,7 @@ void GeneradorRol::AsignarGuias(const std::vector<GestorDatos::Guia>& guias,
 
         size_t idxSala = std::distance(salas.begin(), itSala);
 
-        // Verificar si el guía existía y sigue en el turno
+        // Verificar si el guía existe y sigue en el turno
         auto itGuia = std::find(guiasValidos.begin(), guiasValidos.end(), rolPrev.nombreGuia);
         if (itGuia != guiasValidos.end())
         {
@@ -285,6 +298,10 @@ std::vector<GestorDatos::RolGenerado> GeneradorRol::ComprobarAsignacion(
                                    [&](const GestorDatos::Sala& s)
                                    { return s.nombre == rol.nombreSala; });
  
+        if (itSala == salas.end()) {
+            invalidos.push_back(rol);
+            continue;
+        }
 
         const auto& sala = *itSala;
 
@@ -308,6 +325,11 @@ std::vector<GestorDatos::RolGenerado> GeneradorRol::ComprobarAsignacion(
         auto itGuia = std::find_if(guias.begin(), guias.end(),
                                    [&](const GestorDatos::Guia& g)
                                    { return g.nombre == rol.nombreGuia; });
+
+        if (itGuia == guias.end()) {
+            invalidos.push_back(rol);
+            continue;
+        }
 
         const auto& guia = *itGuia;
 
@@ -371,6 +393,8 @@ void GeneradorRol::AplicarCambiosInternos(
     const GestorDatos::Vacaciones& vacaciones,
     const std::string& turno)
 {
+    std::unordered_set<std::string> guiasUsadosComoReemplazo;
+
     // 1) Obtener roles inválidos con turno y operadores filtrados
     auto invalidos = ComprobarAsignacion(guias, salas, rolesGenerados, operadores, vacaciones, turno);
 
@@ -394,6 +418,10 @@ void GeneradorRol::AplicarCambiosInternos(
         auto itSala = std::find_if(
             salas.begin(), salas.end(),
             [&](const GestorDatos::Sala& s) { return s.nombre == rolInvalido.nombreSala; });
+
+        if (itSala == salas.end()) {
+            continue;
+        }
 
         const auto& sala = *itSala;
 
@@ -421,6 +449,9 @@ void GeneradorRol::AplicarCambiosInternos(
         {
             if (EsOperadorOVacacion(g.nombre, operadores, vacaciones))
                 continue;
+            
+            if (guiasUsadosComoReemplazo.count(g.nombre))
+                continue;
 
             bool yaAsignado = std::any_of(
                 rolesGenerados.begin(), rolesGenerados.end(),
@@ -441,6 +472,9 @@ void GeneradorRol::AplicarCambiosInternos(
             {
                 // No operadores ni vacaciones
                 if (EsOperadorOVacacion(g.nombre, operadores, vacaciones))
+                    continue;
+            
+                if (guiasUsadosComoReemplazo.count(g.nombre))
                     continue;
 
                 // Evitar intercambiar desde salas obligatorias si estamos corrigiendo una obligatoria
@@ -497,6 +531,7 @@ void GeneradorRol::AplicarCambiosInternos(
         if (salaInvalida)
         {
             salaInvalida->nombreCambioInterno = guiaEntra;
+            guiasUsadosComoReemplazo.insert(guiaEntra);
         }
 
         if (salaReemplazo)
