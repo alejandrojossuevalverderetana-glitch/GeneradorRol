@@ -58,7 +58,7 @@ bool GeneradorRol::EstaEnSalaCorrecta(
     if (nombreGuia == vacaciones.vacacion2)
         return nombreSala == "vacaciones2";
     
-    return true; // No es operador/vacación, está bien en cualquier sala
+    return false;
 }
 bool GeneradorRol::GuiaValidoParaTurno(
         const std::string& turnoGuia,

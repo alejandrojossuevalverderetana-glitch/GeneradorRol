@@ -35,7 +35,7 @@ GestorDatos::GestorDatos(const nlohmann::json& AppData)
         Sala s;
         s.nombre = nombre;
         s.capacitacion = "";      // No requieren capacitación
-        s.obligatoria = true;    // Son obligatorias
+        s.obligatoria = false;    // No son obligatorias
         s.numero = contadorSala++;
         salas.push_back(s);
     };
