@@ -672,6 +672,7 @@ async function generarRoles() {
     dom.exportBtn.onclick = () => {
       state.rolesAnteriores[state.turno] = JSON.parse(JSON.stringify(state.roles));
       exportarCSV();
+      dom.output.classList.add("hidden")
     }
       
       
