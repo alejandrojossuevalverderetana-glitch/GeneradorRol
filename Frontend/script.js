@@ -520,7 +520,10 @@ async function generarRoles() {
             valor: state.valor,
             guias: state.guias,   // lista de guías
             salas: state.salas,   // lista de salas
-            roles: state.rolesAnteriores[state.turno],   // roles actuales, si aplica
+            roles: state.rolesAnteriores[state.turno].map(rol => ({
+              nombreGuia: rol.nombreGuia,
+              nombreSala: rol.nombreSala
+            })),
             cambios: state.cambios, // cambios si los tienes
             operadores: {
               operador1: state.operadores.operador1 || "",
@@ -672,6 +675,7 @@ async function generarRoles() {
     dom.exportBtn.onclick = () => {
       state.rolesAnteriores[state.turno] = JSON.parse(JSON.stringify(state.roles));
       exportarCSV();
+      dom.cancelarRol.classList.remove("hidden")
       dom.output.classList.add("hidden")
     }
       
