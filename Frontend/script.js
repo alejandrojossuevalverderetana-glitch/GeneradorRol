@@ -21,15 +21,15 @@ const App = (() => {
     // ======================
     // TURNO MAÑANA
     // ======================
-    { nombre: "Ana",     turno: "mañana", capacitaciones: ["Tele", "Operador"] },
-    { nombre: "Pedro",   turno: "mañana", capacitaciones: ["Radio"] },
-    { nombre: "Juan",    turno: "mañana", capacitaciones: ["Tele"] },
-    { nombre: "Lucía",   turno: "mañana", capacitaciones: [] },
-    { nombre: "Carlos",  turno: "mañana", capacitaciones: ["Steam"] },
-    { nombre: "Sofía",   turno: "mañana", capacitaciones: ["Radio", "Tele"] },
-    { nombre: "Diego",   turno: "mañana", capacitaciones: [] },
-    { nombre: "Valeria", turno: "mañana", capacitaciones: ["Tele"] },
-    { nombre: "Andrés",  turno: "mañana", capacitaciones: ["Radio"] },
+    { nombre: "Ana",     turno: "manana", capacitaciones: ["Tele", "Operador"] },
+    { nombre: "Pedro",   turno: "manana", capacitaciones: ["Radio"] },
+    { nombre: "Juan",    turno: "manana", capacitaciones: ["Tele"] },
+    { nombre: "Lucía",   turno: "manana", capacitaciones: [] },
+    { nombre: "Carlos",  turno: "manana", capacitaciones: ["Steam"] },
+    { nombre: "Sofía",   turno: "manana", capacitaciones: ["Radio", "Tele"] },
+    { nombre: "Diego",   turno: "manana", capacitaciones: [] },
+    { nombre: "Valeria", turno: "manana", capacitaciones: ["Tele"] },
+    { nombre: "Andrés",  turno: "manana", capacitaciones: ["Radio"] },
 
     // ======================
     // TURNO TARDE
@@ -111,7 +111,7 @@ const App = (() => {
     valor: 2,
 
     // Turno actual
-    turno: "mañana",
+    turno: "manana",
 
     // Estado UI
     actual: {
@@ -136,6 +136,7 @@ const storage = {
       salas: state.salas,
       capacitaciones: state.capacitaciones,
       roles: state.roles,
+      rolesAnteriores: state.rolesAnteriores,
       cambios: state.cambios,
       vacaciones: state.vacaciones,
       operadores: state.operadores,
@@ -156,6 +157,12 @@ const storage = {
       state.salas = data.salas || [];
       state.capacitaciones = data.capacitaciones || [];
       state.roles = data.roles || [];
+      state.rolesAnteriores = data.rolesAnteriores || {
+        manana: [],
+        tarde: [],
+        finesManana: [],
+        finesTarde: []
+      };
       state.cambios = data.cambios || [];
       state.vacaciones = {
         vacacion1: data.vacaciones?.vacacion1 || "",
@@ -168,7 +175,7 @@ const storage = {
       };
 
       state.valor = data.valor ?? 5;
-      state.turno = data.turno || "mañana";
+      state.turno = data.turno || "manana";
       console.log("✅ Datos cargados desde localStorage");
     } catch (e) {
       console.error("⚠️ Error cargando datos:", e);
@@ -359,7 +366,7 @@ const storage = {
     abrirGuia: () => {
       const g = state.actual.guia;
       document.getElementById("editNombreGuia").value = g ? g.nombre : "";
-      document.getElementById("editTurno").value = g ? g.turno : "mañana";
+      document.getElementById("editTurnoGuia").value = g ? g.turno : "manana";
 
       const container = document.getElementById("editCapacitaciones");
       container.innerHTML = "";
@@ -606,7 +613,7 @@ async function generarRoles() {
   selectTarde.innerHTML = '<option value="" disabled selected>Guía tarde</option>';
 
   // Filtrar guías por turno
-  const guiasMañana = state.guias.filter(g => g.turno.includes("mañana") || g.turno.includes("entreSemana"));
+  const guiasMañana = state.guias.filter(g => g.turno.includes("manana") || g.turno.includes("entreSemana"));
   const guiasTarde = state.guias.filter(g => g.turno.includes("tarde") || g.turno.includes("entreSemana"));
 
   // Agregar las opciones de mañana
@@ -675,8 +682,8 @@ async function generarRoles() {
     dom.exportBtn.onclick = () => {
       state.rolesAnteriores[state.turno] = JSON.parse(JSON.stringify(state.roles));
       exportarCSV();
-      dom.cancelarRol.classList.remove("hidden")
-      dom.output.classList.add("hidden")
+      dom.btnRol.classList.remove("hidden")
+      dom.rolesContainer.classList.add("hidden")
     }
       
       
