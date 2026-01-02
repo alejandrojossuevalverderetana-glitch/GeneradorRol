@@ -471,7 +471,22 @@ void GeneradorRol::AplicarCambiosInternos(
     auto invalidos = ComprobarAsignacion(guias, salas, rolesGenerados, operadores, vacaciones, turno);
 
     // Invertir el orden para primero aplicar cambios en operadores
-    std::reverse(invalidos.begin(), invalidos.end());
+    auto prioridadSala = [](const std::string& nombreSala) {
+        if (nombreSala == "Operador2") return 0;
+        if (nombreSala == "Operador1") return 1;
+        if (nombreSala == "Radio")     return 2;
+        if (nombreSala == "Tele")      return 3;
+        return 99; // cualquier otra
+    };
+
+    std::sort(invalidos.begin(), invalidos.end(),
+        [&](const GestorDatos::RolGenerado& a,
+            const GestorDatos::RolGenerado& b)
+        {
+            return prioridadSala(a.nombreSala) < prioridadSala(b.nombreSala);
+        });
+
+    
     // Nada que corregir
     if (invalidos.empty()) return;
 
