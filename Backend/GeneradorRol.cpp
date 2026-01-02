@@ -166,30 +166,38 @@ std::vector<GestorDatos::Guia> GeneradorRol::BuscarGuiasValidos(
                 continue;
         }
 
+        bool esSalaEspecial =
+            sala.nombre == "operador1" ||
+            sala.nombre == "operador2" ||
+            sala.nombre == "vacaciones1" ||
+            sala.nombre == "vacaciones2";
 
         // 4️⃣ Verificar si el guía ya está asignado a otra sala con capacitación
         bool yaAsignado = false;
-        for (const auto& rol : rolesGenerados)
+        if (!esSalaEspecial)
         {
-            if (rol.nombreGuia == g.nombre)
+            for (const auto& rol : rolesGenerados)
             {
-                auto itSala = std::find_if(salas.begin(), salas.end(),
-                    [&](const GestorDatos::Sala& s){
-                        return s.nombre == rol.nombreSala;
-                    });
-
-                // Si esta sala asignada requiere capacitación → no puede asignarse
-                if (itSala != salas.end() && !itSala->capacitacion.empty())
+                if (rol.nombreGuia == g.nombre)
                 {
-                    yaAsignado = true;
+                    auto itSala = std::find_if(salas.begin(), salas.end(),
+                        [&](const GestorDatos::Sala& s){
+                            return s.nombre == rol.nombreSala;
+                        });
+
+                    // Si esta sala asignada requiere capacitación → no puede asignarse
+                    if (itSala != salas.end() && !itSala->capacitacion.empty())
+                    {
+                        yaAsignado = true;
+                        break;
+                    }
+                }
+                // Si ya se realizó un cambio con ese guia no puede asignarse
+                if (rol.nombreCambioInterno == g.nombre)
+                {
+                    yaAsignado = true;    
                     break;
                 }
-            }
-            // Si ya se realizó un cambio con ese guia no puede asignarse
-            if (rol.nombreCambioInterno == g.nombre)
-            {
-                yaAsignado = true;    
-                break;
             }
         }
 
