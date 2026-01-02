@@ -360,9 +360,32 @@ std::vector<GestorDatos::RolGenerado> GeneradorRol::ComprobarAsignacion(
         }
 
         const auto& guia = *itGuia;
+        // =============================
+        // 4A) Validar salas de operador / vacaciones (regla por sala)
+        // =============================
+        if (sala.nombre == "operador1")
+        {
+            if (guia.nombre != operadores.operador1)
+                invalido = true;
+        }
+        else if (sala.nombre == "operador2")
+        {
+            if (guia.nombre != operadores.operador2)
+                invalido = true;
+        }
+        else if (sala.nombre == "vacaciones1")
+        {
+            if (guia.nombre != vacaciones.vacacion1)
+                invalido = true;
+        }
+        else if (sala.nombre == "vacaciones2")
+        {
+            if (guia.nombre != vacaciones.vacacion2)
+                invalido = true;
+        }
 
         // =============================
-        // 4) Verificar operadores y vacaciones
+        // 4B) Verificar operadores y vacaciones
         // =============================
         if (EsOperadorOVacacion(guia.nombre, operadores, vacaciones))
         {
