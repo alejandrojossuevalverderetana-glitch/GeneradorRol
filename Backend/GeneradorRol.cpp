@@ -147,13 +147,6 @@ std::vector<GestorDatos::Guia> GeneradorRol::BuscarGuiasValidos(
         }
 
 
-        // 1️⃣ Excluir operadores y vacaciones (excepto si es su sala correcta)
-        if (EsOperadorOVacacion(g.nombre, operadores, vacaciones))
-        {
-            if (!EstaEnSalaCorrecta(g.nombre, sala.nombre, operadores, vacaciones))
-                continue;
-        }
-
         // 2️⃣ Verificar turno del guía vs turno de la sala
         if (!GuiaValidoParaTurno(g.turno, turno)) 
             continue;
