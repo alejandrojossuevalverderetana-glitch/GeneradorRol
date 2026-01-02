@@ -560,8 +560,6 @@ void GeneradorRol::AplicarCambiosInternos(
                 // Evitar intercambiar desde salas obligatorias si estamos corrigiendo una obligatoria
                 if (salasObligatorias.count(sala.nombre))
                 {
-                    // Estamos corrigiendo una sala obligatoria
-                    // → permitir tomar guías solo de salas NO obligatorias
                     auto rolOrigen = std::find_if(
                         rolesGenerados.begin(), rolesGenerados.end(),
                         [&](const GestorDatos::RolGenerado& r)
@@ -569,7 +567,14 @@ void GeneradorRol::AplicarCambiosInternos(
 
                     if (rolOrigen != rolesGenerados.end())
                     {
-                        if (!salasObligatorias.count(rolOrigen->nombreSala))
+                        bool origenEsEspecial =
+                            rolOrigen->nombreSala == "operador1" ||
+                            rolOrigen->nombreSala == "operador2" ||
+                            rolOrigen->nombreSala == "vacaciones1" ||
+                            rolOrigen->nombreSala == "vacaciones2";
+
+                        // ❗ SOLO bloqueamos si el ORIGEN es especial
+                        if (!origenEsEspecial)
                         {
                             guiaReemplazo = g.nombre;
                             break;
@@ -582,6 +587,7 @@ void GeneradorRol::AplicarCambiosInternos(
                     guiaReemplazo = g.nombre;
                     break;
                 }
+
             }
         }
 
