@@ -124,6 +124,29 @@ std::vector<GestorDatos::Guia> GeneradorRol::BuscarGuiasValidos(
 
     for (const auto& g : guias)
     {
+        // 0️⃣ Validación estricta por tipo de sala (operadores / vacaciones)
+        if (sala.nombre == "operador1")
+        {
+            if (g.nombre != operadores.operador1)
+                continue;
+        }
+        else if (sala.nombre == "operador2")
+        {
+            if (g.nombre != operadores.operador2)
+                continue;
+        }
+        else if (sala.nombre == "vacaciones1")
+        {
+            if (g.nombre != vacaciones.vacacion1)
+                continue;
+        }
+        else if (sala.nombre == "vacaciones2")
+        {
+            if (g.nombre != vacaciones.vacacion2)
+                continue;
+        }
+
+
         // 1️⃣ Excluir operadores y vacaciones (excepto si es su sala correcta)
         if (EsOperadorOVacacion(g.nombre, operadores, vacaciones))
         {
@@ -341,6 +364,21 @@ std::vector<GestorDatos::RolGenerado> GeneradorRol::ComprobarAsignacion(
             // Si NO hay guía y la sala es obligatoria → inválido
             if (sala.obligatoria)
                 invalido = true;
+
+            // Salas de vacaciones se vuelven obligatorias si hay vacaciones
+            if (sala.nombre == "vacaciones1" && !vacaciones.vacacion1.empty())
+                invalido = true;
+
+            if (sala.nombre == "vacaciones2" && !vacaciones.vacacion2.empty())
+                invalido = true;
+
+            // Salas de operador se vuelven obligatorias si hay operador
+            if (sala.nombre == "operador1" && !operadores.operador1.empty())
+                invalido = true;
+
+            if (sala.nombre == "operador2" && !operadores.operador2.empty())
+                invalido = true;
+
             if (invalido)
                 invalidos.push_back(rol);
 
