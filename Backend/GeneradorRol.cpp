@@ -124,6 +124,24 @@ std::vector<GestorDatos::Guia> GeneradorRol::BuscarGuiasValidos(
 
     for (const auto& g : guias)
     {
+        // ❌ Excluir operadores o vacaciones que ya estén asignados en rolesGenerados
+        bool estaEnSalaEspecial = false;
+        for (const auto& rol : rolesGenerados)
+        {
+            if (rol.nombreGuia == g.nombre)
+            {
+                if (rol.nombreSala == "operador1" ||
+                    rol.nombreSala == "operador2" ||
+                    rol.nombreSala == "vacaciones1" ||
+                    rol.nombreSala == "vacaciones2")
+                {
+                    estaEnSalaEspecial = true;
+                    break;
+                }
+            }
+        }
+        if (estaEnSalaEspecial)
+            continue;
         // 0️⃣ Validación estricta por tipo de sala (operadores / vacaciones)
         if (sala.nombre == "operador1")
         {
@@ -508,6 +526,8 @@ void GeneradorRol::AplicarCambiosInternos(
         // 3) Obtener guías válidos (esto ya excluye operadores y fuera de turno)
         auto guiasValidos = BuscarGuiasValidos(
             sala, guias, rolesGenerados, operadores, vacaciones, salas, turno);
+        
+        std::shuffle(guiasValidos.begin(), guiasValidos.end(), std::mt19937{std::random_device{}()});
 
         if (guiasValidos.empty())
         {
