@@ -527,9 +527,7 @@ void GeneradorRol::AplicarCambiosInternos(
         // 4A) Buscar un guía NO ASIGNADO a ninguna sala
         for (const auto& g : guiasValidos)
         {
-            if (EsOperadorOVacacion(g.nombre, operadores, vacaciones))
-                continue;
-            
+         
             if (guiasUsadosComoReemplazo.count(g.nombre))
                 continue;
 
@@ -550,9 +548,8 @@ void GeneradorRol::AplicarCambiosInternos(
         {
             for (const auto& g : guiasValidos)
             {
-                // No operadores ni vacaciones
-                if (EsOperadorOVacacion(g.nombre, operadores, vacaciones))
-                    continue;
+
+
             
                 if (guiasUsadosComoReemplazo.count(g.nombre))
                     continue;
@@ -587,7 +584,6 @@ void GeneradorRol::AplicarCambiosInternos(
                     guiaReemplazo = g.nombre;
                     break;
                 }
-
             }
         }
 
