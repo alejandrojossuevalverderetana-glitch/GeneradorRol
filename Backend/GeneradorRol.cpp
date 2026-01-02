@@ -415,16 +415,6 @@ std::vector<GestorDatos::RolGenerado> GeneradorRol::ComprobarAsignacion(
                 invalido = true;
         }
 
-        // =============================
-        // 4B) Verificar operadores y vacaciones
-        // =============================
-        if (EsOperadorOVacacion(guia.nombre, operadores, vacaciones))
-        {
-            if (!EstaEnSalaCorrecta(guia.nombre, sala.nombre, operadores, vacaciones))
-                invalido = true;
-            
-        }
-
 
         // =============================
         // 5) Verificar capacitación necesaria
