@@ -22,6 +22,11 @@
 class GeneradorRol {
 private:
 
+    bool CambioInternoValido(
+    const std::string& guia,
+    const std::string& salaNombre,
+    const std::vector<GestorDatos::Guia>& guias,
+    const std::vector<GestorDatos::Sala>& salas);
     /**
      * @brief Determina si un guía corresponde a un operador o a una vacación.
      * 
@@ -186,6 +191,13 @@ private:
         const GestorDatos::Operadores& operadores,
         const GestorDatos::Vacaciones& vacaciones,
         const std::string& turno);
+
+    void SegundaRevisionCambiosInternos(
+    const std::vector<GestorDatos::Guia>& guias,
+    const std::vector<GestorDatos::Sala>& salas,
+    const GestorDatos::Operadores& operadores,
+    const GestorDatos::Vacaciones& vacaciones,
+    const std::string& turno);
 
 public:
     /** @brief Constructor por defecto. */

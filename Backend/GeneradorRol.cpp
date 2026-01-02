@@ -26,6 +26,34 @@ bool GeneradorRol::ValidarDisponibilidad(const std::vector<GestorDatos::Guia>& g
     return guiasValidos > obligatorias;
 }
 
+bool GeneradorRol::CambioInternoValido(
+    const std::string& guia,
+    const std::string& salaNombre,
+    const std::vector<GestorDatos::Guia>& guias,
+    const std::vector<GestorDatos::Sala>& salas)
+{
+    auto itSala = std::find_if(
+        salas.begin(), salas.end(),
+        [&](const GestorDatos::Sala& s) { return s.nombre == salaNombre; });
+
+    if (itSala == salas.end() || itSala->capacitacion.empty())
+        return true;
+
+    auto itGuia = std::find_if(
+        guias.begin(), guias.end(),
+        [&](const GestorDatos::Guia& g) { return g.nombre == guia; });
+
+    if (itGuia == guias.end())
+        return false;
+
+    return std::find(
+        itGuia->capacitaciones.begin(),
+        itGuia->capacitaciones.end(),
+        itSala->capacitacion
+    ) != itGuia->capacitaciones.end();
+}
+
+
 /**
  * @brief Helper: verifica si un guía es operador o está en vacaciones
  */
@@ -398,6 +426,8 @@ void GeneradorRol::AplicarCambiosInternos(
     // 1) Obtener roles inválidos con turno y operadores filtrados
     auto invalidos = ComprobarAsignacion(guias, salas, rolesGenerados, operadores, vacaciones, turno);
 
+    // Invertir el orden para primero aplicar cambios en operadores
+    std::reverse(invalidos.begin(), invalidos.end());
     // Nada que corregir
     if (invalidos.empty()) return;
 
@@ -541,6 +571,64 @@ void GeneradorRol::AplicarCambiosInternos(
     }
 }
 
+void GeneradorRol::SegundaRevisionCambiosInternos(
+    const std::vector<GestorDatos::Guia>& guias,
+    const std::vector<GestorDatos::Sala>& salas,
+    const GestorDatos::Operadores& operadores,
+    const GestorDatos::Vacaciones& vacaciones,
+    const std::string& turno)
+{
+    for (auto& rol : rolesGenerados)
+    {
+        if (rol.nombreCambioInterno.empty())
+            continue;
+
+        if (CambioInternoValido(
+                rol.nombreCambioInterno,
+                rol.nombreSala,
+                guias,
+                salas))
+            continue;
+
+        // Buscar reemplazo válido
+        auto guiasValidos = BuscarGuiasValidos(
+            *std::find_if(salas.begin(), salas.end(),
+                [&](const GestorDatos::Sala& s){ return s.nombre == rol.nombreSala; }),
+            guias,
+            rolesGenerados,
+            operadores,
+            vacaciones,
+            salas,
+            turno);
+
+        for (const auto& g : guiasValidos)
+        {
+            if (g.nombre == rol.nombreGuia)
+                continue;
+
+            // swap SOLO de cambios internos
+            for (auto& otro : rolesGenerados)
+            {
+                if (otro.nombreGuia == g.nombre)
+                {
+                    std::swap(rol.nombreCambioInterno,
+                              otro.nombreCambioInterno);
+                    break;
+                }
+            }
+
+            // basta con un swap válido
+            if (CambioInternoValido(
+                    rol.nombreCambioInterno,
+                    rol.nombreSala,
+                    guias,
+                    salas))
+                break;
+        }
+    }
+}
+
+
 /**
  * @brief Genera el rol completo del día, aplicando rotación y cambios internos.
  * 
@@ -571,7 +659,7 @@ std::vector<GestorDatos::RolGenerado> GeneradorRol::generarRoles(const GestorDat
     // - Intenta reemplazarlos con guías válidos.
     // - Jamás usa operadores como reemplazo.
     AplicarCambiosInternos(datos.guias, datos.salas, datos.operadores, datos.vacaciones, datos.turno);
-
+    SegundaRevisionCambiosInternos(datos.guias, datos.salas, datos.operadores, datos.vacaciones, datos.turno);
     // ===============================
     // 3️⃣ Cambios externos (futuro)
     // ===============================
