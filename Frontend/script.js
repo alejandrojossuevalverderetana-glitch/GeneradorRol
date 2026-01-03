@@ -82,16 +82,10 @@ const App = (() => {
     { nombre: "Lauro",      turno: "entreSemana tarde", capacitaciones: [] },
 
     // --------- FINES DE SEMANA MAÑANA (4 guías) ---------
-    { nombre: "Gabriela",   turno: "fines manana", capacitaciones: ["Tele", "Operador"] },
-    { nombre: "Héctor",     turno: "fines manana", capacitaciones: ["Radio"] },
-    { nombre: "Irene",      turno: "fines manana", capacitaciones: ["Steam", "Radio"] },
-    { nombre: "Javier",     turno: "fines manana", capacitaciones: [] },
-
-    // --------- FINES DE SEMANA TARDE (4 guías) ---------
-    { nombre: "Karina",     turno: "fines tarde", capacitaciones: ["Tele", "Operador"] },
-    { nombre: "Leonardo",   turno: "fines tarde", capacitaciones: ["Radio", "Tele"] },
-    { nombre: "Marcela",    turno: "fines tarde", capacitaciones: ["Steam"] },
-    { nombre: "Nicolás",    turno: "fines tarde", capacitaciones: [] }
+    { nombre: "Gabriela",   turno: "fines", capacitaciones: ["Tele", "Operador"] },
+    { nombre: "Héctor",     turno: "fines", capacitaciones: ["Radio"] },
+    { nombre: "Irene",      turno: "fines", capacitaciones: ["Steam", "Radio"] },
+    { nombre: "Javier",     turno: "fines", capacitaciones: [] }
   ],
 
   // ======================
@@ -132,10 +126,10 @@ const App = (() => {
     ],
     // Roles anteriores, por turno
     rolesAnteriores: {
-      manana: [],
-      tarde: [],
-      finesManana: [],
-      finesTarde: []
+      entresemanamanana: [],
+      entresemanatarde: [],
+      finesmanana: [],
+      finestarde: []
     },
 
     // Coincide con GestorDatos::Operadores
@@ -201,10 +195,10 @@ const storage = {
       state.capacitaciones = data.capacitaciones || [];
       state.roles = data.roles || [];
       state.rolesAnteriores = data.rolesAnteriores || {
-        manana: [],
-        tarde: [],
-        finesManana: [],
-        finesTarde: []
+        entresemanamanana: [],
+        entresemanatarde: [],
+        finesmanana: [],
+        finestarde: []
       };
       state.cambios = data.cambios || [];
       state.vacaciones = {
@@ -280,12 +274,19 @@ const storage = {
   const render = {
     guias: () => {
       const tbody = document.querySelector("#tablaGuias tbody");
+      const turnoMap = {
+        "manana": "mañana",
+        "tarde": "tarde",
+        "fines": "fines",
+        "entreSemana manana": "TC mañana",
+        "entreSemana tarde": "TC tarde"
+      };
       tbody.innerHTML = "";
       state.guias.forEach((g, i) => {
         const tr = document.createElement("tr");
         tr.innerHTML = `
           <td>${g.nombre}</td>
-          <td>${g.turno}</td>
+          <td>${turnoMap[g.turno]}</td>
           <td>${g.capacitaciones.join(", ")}</td>
           <td>
             <button class="editar" data-index="${i}" data-type="guia">✏️</button>
@@ -343,53 +344,63 @@ const storage = {
         tbody.appendChild(tr);
       });
     },
-  cambios: (cambios, tabla) => {
-    if (!Array.isArray(cambios) || !tabla) return;
+    cambios: (cambios, tabla) => {
+      if (!Array.isArray(cambios) || !tabla) return;
 
-    const filas = cambios.map(c => `
-      <tr>
-        <td>${c.guiaMañana}</td>
-        <td>${c.guiaTarde}</td>
-      </tr>
-    `).join("");
+      const filas = cambios.map(c => `
+        <tr>
+          <td>${c.guiaMañana}</td>
+          <td>${c.guiaTarde}</td>
+        </tr>
+      `).join("");
 
-    tabla.innerHTML = `
-      <tr>
-        <th> (PROXIMAMENTE) </th>
-      </tr>
-      ${filas}
-    `;
+      tabla.innerHTML = `
+        <tr>
+          <th> (PROXIMAMENTE) </th>
+        </tr>
+        ${filas}
+      `;
 
-    // tabla.classList.remove("hidden");
-  },
-  vacaciones: (turno) => {
-    const container = document.getElementById("editVacaciones");
+      // tabla.classList.remove("hidden");
+    },
+    vacaciones: (turno) => {
+      const container = document.getElementById("editVacaciones");
       container.innerHTML = "";
 
-      const guiasTurno = state.guias.filter(g =>
-        turno.startsWith("fines")
-          ? g.turno.includes(turno.split(" ")[1])
-          : g.turno === turno || g.turno.includes("entreSemana")
-      );
+      const guiasTurno = state.guias.filter(g => {
+        if (turno.startsWith("fines")) {
+          const subTurno = turno.split(" ")[1];
+          return (
+            g.turno.includes("fines") ||
+            g.turno.includes(subTurno)
+          );
+        } else {
+          return (
+            g.turno.includes(turno) ||
+            g.turno.includes("entreSemana")
+          );
+        }
+      });
 
       guiasTurno.forEach(g => {
         const checked =
           g.nombre === state.vacaciones.vacacion1 ||
           g.nombre === state.vacaciones.vacacion2;
 
-          const label = document.createElement("label");
-          label.classList.add("checkbox-label"); // Clase para aplicar estilos
+        const label = document.createElement("label");
+        label.classList.add("checkbox-label");
 
-          const input = document.createElement("input");
-          input.type = "checkbox";
-          input.value = g.nombre;
-          if (checked) input.checked = true;
-          input.classList.add("checkbox-input"); // Clase para aplicar estilos
+        const input = document.createElement("input");
+        input.type = "checkbox";
+        input.value = g.nombre;
+        input.checked = checked;
+        input.classList.add("checkbox-input");
 
-          label.appendChild(input);
-          label.appendChild(document.createTextNode(g.nombre));
-          container.appendChild(label);
-      }); 
+        label.appendChild(input);
+        label.appendChild(document.createTextNode(g.nombre));
+        container.appendChild(label);
+      });
+
       container.onchange = () => {
         const checked = container.querySelectorAll("input:checked");
         if (checked.length > 2) {
@@ -397,9 +408,7 @@ const storage = {
           alert("Solo se pueden seleccionar 2 guías en vacaciones.");
         }
       };
-  }
-
-
+    }
   };
 // =====================================================
 // 📄 Manejo de formularios
@@ -447,9 +456,9 @@ const storage = {
       let operadores;
 
       if (turno.startsWith("fines")) {
-        const partes = turno.split("-");
+        const partes = turno.split(" ");
         const subTurno = partes[1];
-        operadores = state.guias.filter(g => g.capacitaciones.includes("Operador") && g.turno.includes(subTurno));
+        operadores = state.guias.filter(g => g.capacitaciones.includes("Operador") && (g.turno.includes(subTurno) || g.turno.includes("fines")));
       }else {
         operadores = state.guias.filter(
           g =>
@@ -561,16 +570,26 @@ const storage = {
 }
   };
 
+function getTurnoKey(turno) {
+  return turno
+    .normalize("NFD")       // normaliza unicode
+    .toLowerCase()
+    .replace(/\s+/g, "")    // elimina CUALQUIER espacio
+    .trim();
+}
+
 // Función para generar roles desde la API
 async function generarRoles() {
     try {
+        const turnoKey = getTurnoKey(state.turno)
         // Preparar los datos que enviarás al servidor (puedes ajustarlo según tu estructura)
         const payload = {
             turno: state.turno,
             valor: state.valor,
             guias: state.guias,   // lista de guías
             salas: state.salas,   // lista de salas
-            roles: state.rolesAnteriores[state.turno].map(rol => ({
+            
+            roles: state.rolesAnteriores[turnoKey].map(rol => ({
               nombreGuia: rol.nombreGuia,
               nombreSala: rol.nombreSala
             })),
@@ -723,7 +742,8 @@ async function generarRoles() {
       generarRoles();
     };
     dom.exportBtn.onclick = () => {
-      state.rolesAnteriores[state.turno] = JSON.parse(JSON.stringify(state.roles));
+      const turnoKey = getTurnoKey(state.turno);
+      state.rolesAnteriores[turnoKey] = JSON.parse(JSON.stringify(state.roles));
       exportarCSV();
       dom.btnRol.classList.remove("hidden")
       dom.rolesContainer.classList.add("hidden")
