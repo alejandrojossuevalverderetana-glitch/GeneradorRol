@@ -148,7 +148,7 @@ const App = (() => {
     valor: 2,
 
     // Turno actual
-    turno: "manana",
+    turno: "entresemana manana",
 
     // Estado UI
     actual: {
@@ -212,7 +212,7 @@ const storage = {
       };
 
       state.valor = data.valor ?? 5;
-      state.turno = data.turno || "manana";
+      state.turno = data.turno || "entresemana manana";
       console.log("✅ Datos cargados desde localStorage");
     } catch (e) {
       console.error("⚠️ Error cargando datos:", e);
