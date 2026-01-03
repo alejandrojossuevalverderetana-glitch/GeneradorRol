@@ -16,71 +16,114 @@ const App = (() => {
 // 🗂 Estado de la aplicación
 // Se almacenan datos principales: guías, salas, capacitaciones, roles generados y elementos seleccionados actualmente
 // =====================================================
-  const state =   {
+  const state = {
+  // ======================
+  // GUÍAS - 60 GUÍAS TOTALES
+  // ======================
   guias: [
-    // ======================
-    // TURNO MAÑANA
-    // ======================
-    { nombre: "Ana",     turno: "manana", capacitaciones: ["Tele", "Operador"] },
-    { nombre: "Pedro",   turno: "manana", capacitaciones: ["Radio"] },
-    { nombre: "Juan",    turno: "manana", capacitaciones: ["Tele"] },
-    { nombre: "Lucía",   turno: "manana", capacitaciones: [] },
-    { nombre: "Carlos",  turno: "manana", capacitaciones: ["Steam"] },
-    { nombre: "Sofía",   turno: "manana", capacitaciones: ["Radio", "Tele"] },
-    { nombre: "Diego",   turno: "manana", capacitaciones: [] },
-    { nombre: "Valeria", turno: "manana", capacitaciones: ["Tele"] },
-    { nombre: "Andrés",  turno: "manana", capacitaciones: ["Radio"] },
+    // --------- TURNO MAÑANA (16 guías) ---------
+    { nombre: "Ana",        turno: "manana", capacitaciones: ["Tele", "Operador"] },
+    { nombre: "Pedro",      turno: "manana", capacitaciones: ["Radio"] },
+    { nombre: "Juan",       turno: "manana", capacitaciones: ["Tele"] },
+    { nombre: "Lucía",      turno: "manana", capacitaciones: [] },
+    { nombre: "Carlos",     turno: "manana", capacitaciones: ["Steam"] },
+    { nombre: "Sofía",      turno: "manana", capacitaciones: ["Radio", "Tele"] },
+    { nombre: "Diego",      turno: "manana", capacitaciones: [] },
+    { nombre: "Valeria",    turno: "manana", capacitaciones: ["Tele"] },
+    { nombre: "Marcos",     turno: "manana", capacitaciones: ["Radio", "Steam"] },
+    { nombre: "Patricia",   turno: "manana", capacitaciones: ["Tele", "Operador"] },
+    { nombre: "Roberto",    turno: "manana", capacitaciones: ["Steam"] },
+    { nombre: "Susana",     turno: "manana", capacitaciones: ["Radio"] },
+    { nombre: "Tomás",      turno: "manana", capacitaciones: [] },
+    { nombre: "Úrsula",     turno: "manana", capacitaciones: ["Tele"] },
+    { nombre: "Víctor",     turno: "manana", capacitaciones: ["Radio", "Operador"] },
+    { nombre: "Ximena",     turno: "manana", capacitaciones: ["Steam", "Radio"] },
 
-    // ======================
-    // TURNO TARDE
-    // ======================
-    { nombre: "Salem",   turno: "tarde", capacitaciones: ["Tele", "Operador"] },
-    { nombre: "Luis",    turno: "tarde", capacitaciones: ["Radio"] },
-    { nombre: "María",   turno: "tarde", capacitaciones: ["Tele"] },
-    { nombre: "Paula",   turno: "tarde", capacitaciones: [] },
-    { nombre: "Jorge",   turno: "tarde", capacitaciones: ["Steam"] },
-    { nombre: "Elena",   turno: "tarde", capacitaciones: ["Radio", "Tele"] },
-    { nombre: "Ricardo", turno: "tarde", capacitaciones: [] },
-    { nombre: "Camila",  turno: "tarde", capacitaciones: ["Tele"] }
+    // --------- TURNO TARDE (16 guías) ---------
+    { nombre: "Salem",      turno: "tarde", capacitaciones: ["Tele", "Operador"] },
+    { nombre: "Luis",       turno: "tarde", capacitaciones: ["Radio"] },
+    { nombre: "María",      turno: "tarde", capacitaciones: ["Tele"] },
+    { nombre: "Paula",      turno: "tarde", capacitaciones: [] },
+    { nombre: "Jorge",      turno: "tarde", capacitaciones: ["Steam"] },
+    { nombre: "Elena",      turno: "tarde", capacitaciones: ["Radio", "Tele", "Operador"] },
+    { nombre: "Ricardo",    turno: "tarde", capacitaciones: [] },
+    { nombre: "Camila",     turno: "tarde", capacitaciones: ["Tele"] },
+    { nombre: "Daniela",    turno: "tarde", capacitaciones: ["Radio", "Steam"] },
+    { nombre: "Emilio",     turno: "tarde", capacitaciones: ["Tele", "Operador"] },
+    { nombre: "Flavia",     turno: "tarde", capacitaciones: ["Steam"] },
+    { nombre: "Guillermo",  turno: "tarde", capacitaciones: ["Radio"] },
+    { nombre: "Helena",     turno: "tarde", capacitaciones: [] },
+    { nombre: "Iván",       turno: "tarde", capacitaciones: ["Tele"] },
+    { nombre: "Jacqueline", turno: "tarde", capacitaciones: ["Radio", "Operador"] },
+    { nombre: "Konstantino",turno: "tarde", capacitaciones: ["Steam", "Radio"] },
+
+    // --------- TIEMPO COMPLETO MAÑANA (10 guías) ---------
+    { nombre: "Andrés",     turno: "entreSemana manana", capacitaciones: ["Radio", "Steam"] },
+    { nombre: "Martín",     turno: "entreSemana manana", capacitaciones: ["Operador", "Tele"] },
+    { nombre: "Beatriz",    turno: "entreSemana manana", capacitaciones: ["Radio"] },
+    { nombre: "Cesar",      turno: "entreSemana manana", capacitaciones: ["Tele"] },
+    { nombre: "Dorotea",    turno: "entreSemana manana", capacitaciones: [] },
+    { nombre: "Estefanía",  turno: "entreSemana manana", capacitaciones: ["Steam", "Tele"] },
+    { nombre: "Facundo",    turno: "entreSemana manana", capacitaciones: ["Radio"] },
+    { nombre: "Griselda",   turno: "entreSemana manana", capacitaciones: ["Operador"] },
+    { nombre: "Horacio",    turno: "entreSemana manana", capacitaciones: ["Steam", "Radio"] },
+    { nombre: "Isidro",     turno: "entreSemana manana", capacitaciones: [] },
+
+    // --------- TIEMPO COMPLETO TARDE (10 guías) ---------
+    { nombre: "Fernanda",   turno: "entreSemana tarde", capacitaciones: ["Radio"] },
+    { nombre: "Gonzalo",    turno: "entreSemana tarde", capacitaciones: ["Steam", "Operador"] },
+    { nombre: "Valentina",  turno: "entreSemana tarde", capacitaciones: ["Tele"] },
+    { nombre: "Francisco",  turno: "entreSemana tarde", capacitaciones: [] },
+    { nombre: "Gloria",     turno: "entreSemana tarde", capacitaciones: ["Radio", "Tele"] },
+    { nombre: "Humberto",   turno: "entreSemana tarde", capacitaciones: ["Steam"] },
+    { nombre: "Irma",       turno: "entreSemana tarde", capacitaciones: ["Tele"] },
+    { nombre: "Jaime",      turno: "entreSemana tarde", capacitaciones: ["Radio", "Operador"] },
+    { nombre: "Kandy",      turno: "entreSemana tarde", capacitaciones: ["Steam", "Tele"] },
+    { nombre: "Lauro",      turno: "entreSemana tarde", capacitaciones: [] },
+
+    // --------- FINES DE SEMANA MAÑANA (4 guías) ---------
+    { nombre: "Gabriela",   turno: "fines manana", capacitaciones: ["Tele", "Operador"] },
+    { nombre: "Héctor",     turno: "fines manana", capacitaciones: ["Radio"] },
+    { nombre: "Irene",      turno: "fines manana", capacitaciones: ["Steam", "Radio"] },
+    { nombre: "Javier",     turno: "fines manana", capacitaciones: [] },
+
+    // --------- FINES DE SEMANA TARDE (4 guías) ---------
+    { nombre: "Karina",     turno: "fines tarde", capacitaciones: ["Tele", "Operador"] },
+    { nombre: "Leonardo",   turno: "fines tarde", capacitaciones: ["Radio", "Tele"] },
+    { nombre: "Marcela",    turno: "fines tarde", capacitaciones: ["Steam"] },
+    { nombre: "Nicolás",    turno: "fines tarde", capacitaciones: [] }
   ],
 
-    salas: [
-      {
-        nombre: "Universo",
-        capacitacion: "",
-        obligatoria: true
-      },
-      {
-        nombre: "Tierra",
-        capacitacion: "",
-        obligatoria: true
-      },
-      {
-        nombre: "Costa Rica",
-        capacitacion: "",
-        obligatoria: false
-      },
-      {
-        nombre: "Estadio",
-        capacitacion: "",
-        obligatoria: false
-      },
-      {
-        nombre: "Radio",
-        capacitacion: "Radio",
-        obligatoria: true
-      },
-      {
-        nombre: "Television",
-        capacitacion: "Tele",
-        obligatoria: true
-      },
-      {
-        nombre: "Steam",
-        capacitacion: "Steam",
-        obligatoria: false
-      }
-    ],
+  // ======================
+  // SALAS - 18 SALAS TOTALES
+  // ======================
+  salas: [
+    // --------- SALAS OBLIGATORIAS SIN CAPACITACIÓN (4) ---------
+    { nombre: "Universo",     capacitacion: "",      obligatoria: true },
+    { nombre: "Tierra",       capacitacion: "",      obligatoria: true },
+    { nombre: "Espacio",      capacitacion: "",      obligatoria: true },
+    { nombre: "Planeta",      capacitacion: "",      obligatoria: true },
+    
+    // --------- SALAS NO OBLIGATORIAS SIN CAPACITACIÓN (3) ---------
+    { nombre: "Costa Rica",   capacitacion: "",      obligatoria: false },
+    { nombre: "Estadio",      capacitacion: "",      obligatoria: false },
+    { nombre: "Museo",        capacitacion: "",      obligatoria: false },
+    
+    // --------- SALAS CON CAPACITACIÓN RADIO (3) ---------
+    // 1 obligatoria
+    { nombre: "Radio",        capacitacion: "Radio", obligatoria: true },
+    
+    // --------- SALAS CON CAPACITACIÓN TELE (3) ---------
+    // 1 obligatoria
+    { nombre: "Television",   capacitacion: "Tele",  obligatoria: true },
+
+    // --------- SALAS CON CAPACITACIÓN STEAM (3) ---------
+    // 1 obligatoria, 2 opcionales
+    { nombre: "Steam",        capacitacion: "Steam", obligatoria: true },
+    
+    // --------- SALAS PARA VACACIONES Y OPERADORES ---------
+    // (se agregan automáticamente en el código)
+  ],
 
     capacitaciones: ["Tele", "Radio", "Steam", "Operador"],
 
