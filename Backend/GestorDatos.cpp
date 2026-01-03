@@ -1,4 +1,5 @@
 #include "GestorDatos.hpp"
+#include "GeneradorRol.hpp"
 
 GestorDatos::GestorDatos(const nlohmann::json& AppData)
     : guias(), salas(), roles(), cambios() 
@@ -85,6 +86,12 @@ GestorDatos::GestorDatos(const nlohmann::json& AppData)
         vacaciones.vacacion2 = item.value("vacacion2", "");
     } 
     // --- Asegurar que haya suficientes salas para todos los guías ---
+    std::vector<std::string> guiasValidos;
+    for (const auto& g : guias)
+    {
+        if (!GeneradorRol::GuiaValidoParaTurno(g.turno, turno)) continue;
+        guiasValidos.push_back(g.nombre);
+    }
     if (guias.size() > salas.size()) {
         int faltantes = guias.size() - salas.size();
 
