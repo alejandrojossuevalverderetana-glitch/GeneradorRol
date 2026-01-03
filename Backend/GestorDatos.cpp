@@ -84,4 +84,17 @@ GestorDatos::GestorDatos(const nlohmann::json& AppData)
         vacaciones.vacacion1 = item.value("vacacion1", "");
         vacaciones.vacacion2 = item.value("vacacion2", "");
     } 
+    // --- Asegurar que haya suficientes salas para todos los guías ---
+    if (guias.size() > salas.size()) {
+        int faltantes = guias.size() - salas.size();
+
+        for (int i = 0; i < faltantes; ++i) {
+            Sala s;
+            s.nombre = "fueraRol" + std::to_string(i + 1);
+            s.capacitacion = "";
+            s.obligatoria = false;
+            s.numero = contadorSala++;
+            salas.push_back(s);
+        }
+    }
 }
