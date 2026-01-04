@@ -93,7 +93,7 @@ GestorDatos::GestorDatos(const nlohmann::json& AppData)
         guiasValidos.push_back(g.nombre);
     }
     if (guiasValidos.size() > salas.size()) {
-        int faltantes = guias.size() - salas.size();
+        int faltantes = guiasValidos.size() - salas.size();
 
         for (int i = 0; i < faltantes; ++i) {
             Sala s;
