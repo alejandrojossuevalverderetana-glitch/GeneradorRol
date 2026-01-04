@@ -92,7 +92,7 @@ GestorDatos::GestorDatos(const nlohmann::json& AppData)
         if (!GeneradorRol::GuiaValidoParaTurno(g.turno, turno)) continue;
         guiasValidos.push_back(g.nombre);
     }
-    if (guias.size() > salas.size()) {
+    if (guiasValidos.size() > salas.size()) {
         int faltantes = guias.size() - salas.size();
 
         for (int i = 0; i < faltantes; ++i) {
