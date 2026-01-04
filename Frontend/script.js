@@ -58,28 +58,28 @@ const App = (() => {
     { nombre: "Konstantino",turno: "tarde", capacitaciones: ["Steam", "Radio"] },
 
     // --------- TIEMPO COMPLETO MAÑANA (10 guías) ---------
-    { nombre: "Andrés",     turno: "entreSemana manana", capacitaciones: ["Radio", "Steam"] },
-    { nombre: "Martín",     turno: "entreSemana manana", capacitaciones: ["Operador", "Tele"] },
-    { nombre: "Beatriz",    turno: "entreSemana manana", capacitaciones: ["Radio"] },
-    { nombre: "Cesar",      turno: "entreSemana manana", capacitaciones: ["Tele"] },
-    { nombre: "Dorotea",    turno: "entreSemana manana", capacitaciones: [] },
-    { nombre: "Estefanía",  turno: "entreSemana manana", capacitaciones: ["Steam", "Tele"] },
-    { nombre: "Facundo",    turno: "entreSemana manana", capacitaciones: ["Radio"] },
-    { nombre: "Griselda",   turno: "entreSemana manana", capacitaciones: ["Operador"] },
-    { nombre: "Horacio",    turno: "entreSemana manana", capacitaciones: ["Steam", "Radio"] },
-    { nombre: "Isidro",     turno: "entreSemana manana", capacitaciones: [] },
+    { nombre: "Andrés",     turno: "entresemana manana", capacitaciones: ["Radio", "Steam"] },
+    { nombre: "Martín",     turno: "entresemana manana", capacitaciones: ["Operador", "Tele"] },
+    { nombre: "Beatriz",    turno: "entresemana manana", capacitaciones: ["Radio"] },
+    { nombre: "Cesar",      turno: "entresemana manana", capacitaciones: ["Tele"] },
+    { nombre: "Dorotea",    turno: "entresemana manana", capacitaciones: [] },
+    { nombre: "Estefanía",  turno: "entresemana manana", capacitaciones: ["Steam", "Tele"] },
+    { nombre: "Facundo",    turno: "entresemana manana", capacitaciones: ["Radio"] },
+    { nombre: "Griselda",   turno: "entresemana manana", capacitaciones: ["Operador"] },
+    { nombre: "Horacio",    turno: "entresemana manana", capacitaciones: ["Steam", "Radio"] },
+    { nombre: "Isidro",     turno: "entresemana manana", capacitaciones: [] },
 
     // --------- TIEMPO COMPLETO TARDE (10 guías) ---------
-    { nombre: "Fernanda",   turno: "entreSemana tarde", capacitaciones: ["Radio"] },
-    { nombre: "Gonzalo",    turno: "entreSemana tarde", capacitaciones: ["Steam", "Operador"] },
-    { nombre: "Valentina",  turno: "entreSemana tarde", capacitaciones: ["Tele"] },
-    { nombre: "Francisco",  turno: "entreSemana tarde", capacitaciones: [] },
-    { nombre: "Gloria",     turno: "entreSemana tarde", capacitaciones: ["Radio", "Tele"] },
-    { nombre: "Humberto",   turno: "entreSemana tarde", capacitaciones: ["Steam"] },
-    { nombre: "Irma",       turno: "entreSemana tarde", capacitaciones: ["Tele"] },
-    { nombre: "Jaime",      turno: "entreSemana tarde", capacitaciones: ["Radio", "Operador"] },
-    { nombre: "Kandy",      turno: "entreSemana tarde", capacitaciones: ["Steam", "Tele"] },
-    { nombre: "Lauro",      turno: "entreSemana tarde", capacitaciones: [] },
+    { nombre: "Fernanda",   turno: "entresemana tarde", capacitaciones: ["Radio"] },
+    { nombre: "Gonzalo",    turno: "entresemana tarde", capacitaciones: ["Steam", "Operador"] },
+    { nombre: "Valentina",  turno: "entresemana tarde", capacitaciones: ["Tele"] },
+    { nombre: "Francisco",  turno: "entresemana tarde", capacitaciones: [] },
+    { nombre: "Gloria",     turno: "entresemana tarde", capacitaciones: ["Radio", "Tele"] },
+    { nombre: "Humberto",   turno: "entresemana tarde", capacitaciones: ["Steam"] },
+    { nombre: "Irma",       turno: "entresemana tarde", capacitaciones: ["Tele"] },
+    { nombre: "Jaime",      turno: "entresemana tarde", capacitaciones: ["Radio", "Operador"] },
+    { nombre: "Kandy",      turno: "entresemana tarde", capacitaciones: ["Steam", "Tele"] },
+    { nombre: "Lauro",      turno: "entresemana tarde", capacitaciones: [] },
 
     // --------- FINES DE SEMANA MAÑANA (4 guías) ---------
     { nombre: "Gabriela",   turno: "fines", capacitaciones: ["Tele", "Operador"] },
@@ -278,8 +278,8 @@ const storage = {
         "manana": "mañana",
         "tarde": "tarde",
         "fines": "fines",
-        "entreSemana manana": "TC mañana",
-        "entreSemana tarde": "TC tarde"
+        "entresemana manana": "TC mañana",
+        "entresemana tarde": "TC tarde"
       };
       tbody.innerHTML = "";
       state.guias.forEach((g, i) => {
@@ -368,16 +368,19 @@ const storage = {
       container.innerHTML = "";
 
       const guiasTurno = state.guias.filter(g => {
+        const subTurno = turno.split(" ")[1];
         if (turno.startsWith("fines")) {
-          const subTurno = turno.split(" ")[1];
+          
+          
           return (
             g.turno.includes("fines") ||
             g.turno.includes(subTurno)
           );
         } else {
+          
           return (
-            g.turno.includes(turno) ||
-            g.turno.includes("entreSemana")
+            g.turno == subTurno ||
+            g.turno.includes("entresemana")
           );
         }
       });
@@ -454,16 +457,17 @@ const storage = {
       const turno = state.turno;
 
       let operadores;
-
+      const partes = turno.split(" ");
+      const subTurno = partes[1];
       if (turno.startsWith("fines")) {
-        const partes = turno.split(" ");
-        const subTurno = partes[1];
+        
+        
         operadores = state.guias.filter(g => g.capacitaciones.includes("Operador") && (g.turno.includes(subTurno) || g.turno.includes("fines")));
       }else {
         operadores = state.guias.filter(
           g =>
           g.capacitaciones.includes("Operador") &&
-          (g.turno === turno || g.turno.includes("entreSemana"))
+          (g.turno == subTurno || g.turno.includes("entresemana"))
         );
       }
 
@@ -675,8 +679,8 @@ async function generarRoles() {
   selectTarde.innerHTML = '<option value="" disabled selected>Guía tarde</option>';
 
   // Filtrar guías por turno
-  const guiasMañana = state.guias.filter(g => g.turno.includes("manana") || g.turno.includes("entreSemana"));
-  const guiasTarde = state.guias.filter(g => g.turno.includes("tarde") || g.turno.includes("entreSemana"));
+  const guiasMañana = state.guias.filter(g => g.turno.includes("manana") || g.turno.includes("entresemana"));
+  const guiasTarde = state.guias.filter(g => g.turno.includes("tarde") || g.turno.includes("entresemana"));
 
   // Agregar las opciones de mañana
   guiasMañana.forEach(g => {
